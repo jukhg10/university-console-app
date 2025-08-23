@@ -1,0 +1,13 @@
+2025-08-23 09:36:18.370817-05:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Error de Sintaxis en sentencia SQL "[*]se"; se esperaba "SAVEPOINT, SCRIPT, SHUTDOWN"
+Syntax error in SQL statement "[*]se"; expected "SAVEPOINT, SCRIPT, SHUTDOWN"; SQL statement:
+se [42001-232]
+2025-08-23 09:36:29.128264-05:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "ESTUDIANTE" not found (this database is empty); SQL statement:
+select * from estudiante [42104-232]
+2025-08-23 09:42:06.903031-05:00 jdbc[4]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HOLA" not found (this database is empty); SQL statement:
+select * from hola [42104-232]
+2025-08-23 09:49:44.342189-05:00 jdbc[6]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "ESTUDIANTE" not found (this database is empty); SQL statement:
+select * from estudiante [42104-232]
