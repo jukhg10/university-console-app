@@ -32,19 +32,22 @@ public class InscripcionDAO {
 
     public List<Inscripcion> cargarDatos() {
         List<Inscripcion> inscripciones = new ArrayList<>();
-        String sql = "SELECT i.id, i.ano, i.semestre, " +
-                     "e.id AS est_id, e.nombres AS est_nombres, e.apellidos AS est_apellidos, " +
-                     "c.id AS cur_id, c.nombre AS cur_nombre " +
-                     "FROM INSCRIPCION i " +
-                     "JOIN ESTUDIANTE e ON i.estudiante_id = e.id " +
-                     "JOIN CURSO c ON i.curso_id = c.id";
+        String sql =  "SELECT i.id, i.ano, i.semestre, " +
+                "p.id AS est_id, p.nombres AS est_nombres, p.apellidos AS est_apellidos, p.email AS est_email, e.codigo AS est_codigo, e.activo AS est_activo, e.promedio AS est_promedio, " +
+                "c.id AS cur_id, c.nombre AS cur_nombre " +
+                "FROM INSCRIPCION i " +
+                "JOIN ESTUDIANTE e ON i.estudiante_id = e.id " +
+                "JOIN PERSONA p ON e.id = p.id " +  // Aquí se obtienen los nombres
+                "JOIN CURSO c ON i.curso_id = c.id";
 
         try (Connection conn = DatabaseManager.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
-                Estudiante est = new Estudiante(rs.getDouble("est_id"), rs.getString("est_nombres"), rs.getString("est_apellidos"), "", 0, true, 0);
+                Estudiante est = new Estudiante(rs.getDouble("est_id"), rs.getString("est_nombres"), rs.getString("est_apellidos"),
+                        rs.getString("est_email"), rs.getDouble("est_codigo"), rs.getBoolean("est_activo"),
+                        rs.getDouble("est_promedio"));
                 Curso cur = new Curso(rs.getInt("cur_id"), rs.getString("cur_nombre"), true);
                 Inscripcion insc = new Inscripcion(est, cur, rs.getInt("ano"), rs.getInt("semestre"));
                 insc.setId(rs.getInt("id"));

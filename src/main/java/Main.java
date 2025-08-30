@@ -22,7 +22,7 @@ public class Main {
 
         System.out.println("Registrando nueva inscripcion con datos: Estudiante 102, Curso 901, Año 2025, Semestre 2 ");
 
-        Estudiante est = new Estudiante(102.0, "Estudiante", "Temp", "", 102.0, true, 0);
+        Estudiante est = new Estudiante(1, "Estudiante", "Temp", "correo@gmail", 102, true, 3.2);
         Curso cur = new Curso(901, "Curso Temp", true);
         Inscripcion nuevaInscripcion = new Inscripcion(est, cur, 2025, 2);
         servicio.inscribirCurso(nuevaInscripcion);
