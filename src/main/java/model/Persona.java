@@ -14,6 +14,8 @@ public class Persona {
     }
 
     // Getters y Setters
+    public void setId(double id) {this.id = id;}   
+    public String getEmail() {return email;}
     public double getId() { return id; }
     public String getNombres() { return nombres; }
     public String getApellidos() { return apellidos; }

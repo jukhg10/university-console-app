@@ -1,53 +1,50 @@
 package services;
 
 import model.CursoProfesor;
-import model.Inscripcion;
-import persistence.InscripcionDAO;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class CursosProfesores implements Servicios{
+// Esta clase ahora gestiona la RELACIÓN entre Cursos y Profesores
+public class CursosProfesores implements Servicios {
 
-    private List<CursoProfesor> listado;
+    private final List<CursoProfesor> asignaciones;
 
-
-
-
-    public void inscribir(CursoProfesor i) {
-
-    }
-    public void guardarInformacion(CursoProfesor i) {
-
+    public CursosProfesores() {
+        this.asignaciones = new ArrayList<>();
     }
 
-    public void cargarDatos() {
-
-    }
-    @Override
-    public String toString() {
-        return "CursosProfesores{" +
-                "listado=" + listado +
-                '}';
+    // --- MÉTODOS PARA LA LÓGICA DE ASIGNACIÓN ---
+    public List<CursoProfesor> getAsignaciones() {
+        return new ArrayList<>(asignaciones);
     }
 
-    // Métodos de la interfaz Servicios
+    public void asignarCurso(CursoProfesor nuevaAsignacion) {
+        this.asignaciones.add(nuevaAsignacion);
+    }
+    
+    public void eliminarAsignacion(CursoProfesor asignacion) {
+        this.asignaciones.remove(asignacion);
+    }
+
+    // --- MÉTODOS REQUERIDOS POR LA INTERFAZ SERVICIOS ---
     @Override
     public String imprimirPosicion(int posicion) {
-        if (posicion >= 0 && posicion < listado.size()) {
-            return listado.get(posicion).toString();
+        if (posicion >= 0 && posicion < asignaciones.size()) {
+            return asignaciones.get(posicion).toString();
         }
         return "Posición inválida.";
     }
 
     @Override
     public int cantidadActual() {
-        return listado.size();
+        return asignaciones.size();
     }
 
     @Override
     public List<String> imprimirLista() {
-        return listado.stream().map(CursoProfesor::toString).collect(Collectors.toList());
+        return asignaciones.stream()
+                         .map(CursoProfesor::toString)
+                         .collect(Collectors.toList());
     }
 }

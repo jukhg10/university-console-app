@@ -30,12 +30,16 @@ public class CursosInscritos implements Servicios {
     public void cargarDatos() {
         this.listado = dao.cargarDatos();
     }
+
+    public List<Inscripcion> imprimirListaCompleta() {
+    return new ArrayList<>(this.listado);
+    }
     
     // Métodos de la interfaz Servicios
     @Override
     public String imprimirPosicion(int posicion) {
         if (posicion >= 0 && posicion < listado.size()) {
-            return listado.get(posicion).toString();
+            return "Posición " + posicion + ": " + listado.get(posicion).toString();
         }
         return "Posición inválida.";
     }
