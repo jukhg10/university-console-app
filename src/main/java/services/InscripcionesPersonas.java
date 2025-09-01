@@ -28,7 +28,7 @@ public class InscripcionesPersonas {
         }
     }
 
-    public void eliminar(int idInscripcion) {
+    public void eliminar(double idInscripcion) {
         listado.removeIf(p -> p.getId() == idInscripcion);
     }
 

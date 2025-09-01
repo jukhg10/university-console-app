@@ -160,6 +160,11 @@
                                       maxWidth="1.7976931348623157E308"
                                       onAction="#handleAgregarPersona"
                                       text="Agregar Persona" />
+                              <Button fx:id="eliminarPersonaBtn"
+                                      maxWidth="1.7976931348623157E308"
+                                      onAction="#handleEliminarPersona"
+                                      text="Eliminar Persona"
+                                      disable="true" />
                            </children>
                         </VBox>
                      </left>

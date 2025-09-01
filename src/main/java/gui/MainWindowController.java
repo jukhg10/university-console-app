@@ -39,6 +39,8 @@ public class MainWindowController {
     private ObservableList<CursoProfesor> asignacionesData;
     private ObservableList<Estudiante> estudiantesData;
 
+    @FXML private Button eliminarPersonaBtn;
+
     // --- Componentes UI (Declaraciones para todas las pestañas) ---
     @FXML private TableView<Inscripcion> inscripcionesTable;
     @FXML private TableColumn<Inscripcion, Integer> idCol;
@@ -223,6 +225,10 @@ public class MainWindowController {
         personaApellidosCol.setCellValueFactory(new PropertyValueFactory<>("apellidos"));
         personaEmailCol.setCellValueFactory(new PropertyValueFactory<>("email"));
         personasTable.setItems(personasData); // Vincula la lista observable
+
+        personasTable.getSelectionModel().selectedItemProperty().addListener(
+                (obs, old, nuev) -> eliminarPersonaBtn.setDisable(nuev == null)
+        );
     }
 
     private void cargarTodosLosDatos() {
@@ -271,7 +277,21 @@ public class MainWindowController {
         return disponibles;
     }
 
+    @FXML
+    private void handleEliminarPersona() {
+        Persona seleccionada = personasTable.getSelectionModel().getSelectedItem();
+        if (seleccionada != null) {
+            // ✅ Usar el método eliminar de InscripcionesPersonas
+            servicioPersonas.eliminar(seleccionada.getId());
 
+            // ✅ Actualizar la tabla
+            personasData.remove(seleccionada);
+            // O si prefieres recargar todo:
+            personasData.setAll(servicioPersonas.listado);
+
+            System.out.println("Persona eliminada: ID=" + seleccionada.getId() + ", " + seleccionada.getNombres() + " " + seleccionada.getApellidos());
+        }
+    }
     @FXML
     private void handleAgregarCurso() {
         try {
