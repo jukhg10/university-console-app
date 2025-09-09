@@ -83,7 +83,7 @@ public class MainWindowController {
     @FXML private TableColumn<Persona, String> personaEmailCol;
 
     // Lista observable para Personas
-    private ObservableList<Persona> personasData;
+    //private ObservableList<Persona> personasData;
 
 
     // --- Facultades ---
@@ -93,8 +93,8 @@ public class MainWindowController {
     @FXML private TableColumn<Facultad, String> facultadNombreCol;
     @FXML private TableColumn<Facultad, String> facultadDecanoCol;
 
-    private ObservableList<Facultad> facultadesData;
-    private List<Facultad> listaDeFacultades;
+    //private ObservableList<Facultad> facultadesData;
+    private ObservableList<Facultad> listaDeFacultades;
 
     // --- Programas ---
 // --- Programas ---
@@ -106,8 +106,8 @@ public class MainWindowController {
     @FXML private TableColumn<Programa, String> programaFechaCol;
     @FXML private TableColumn<Programa, String> programaFacultadCol;
 
-    private ObservableList<Programa> programasData;
-    private List<Programa> listaDeProgramas;
+    private ObservableList<Programa> listaDeProgramas;
+    //private List<Programa> listaDeProgramas;
 
     // --- Cursos ---
     @FXML private Button agregarCursoBtn;
@@ -138,21 +138,21 @@ public class MainWindowController {
         profesoresData = FXCollections.observableArrayList();
         asignacionesData = FXCollections.observableArrayList();
         estudiantesData = FXCollections.observableArrayList();
-        personasData = FXCollections.observableArrayList(); // ← Nuevo
+        //personasData = FXCollections.observableArrayList(); // ← Nuevo
 
 
-        listaDeFacultades = new ArrayList<>();
-        facultadesData = FXCollections.observableArrayList();
+        listaDeFacultades = FXCollections.observableArrayList();
+       // facultadesData = FXCollections.observableArrayList();
 
-        listaDeProgramas = new ArrayList<>();
-        programasData = FXCollections.observableArrayList();
+        listaDeProgramas = FXCollections.observableArrayList();
+        //programasData = FXCollections.observableArrayList();
 
         configurarTodasLasTablas();
         cargarTodosLosDatos();
     }
 
     private void configurarTodasLasTablas() {
-
+        personasTable.setItems(servicioPersonas.listado);
         cursoIdCol.setCellValueFactory(new PropertyValueFactory<>("id"));
         cursoNombreCol.setCellValueFactory(new PropertyValueFactory<>("nombre"));
         cursoProgramaCol.setCellValueFactory(cellData ->
@@ -176,7 +176,7 @@ public class MainWindowController {
                         cellData.getValue().getFacultad() != null ? cellData.getValue().getFacultad().getNombre() : "Sin facultad"
                 )
         );
-        programasTable.setItems(programasData);
+        programasTable.setItems(listaDeProgramas);
 
         facultadIdCol.setCellValueFactory(new PropertyValueFactory<>("id"));
         facultadNombreCol.setCellValueFactory(new PropertyValueFactory<>("nombre"));
@@ -185,7 +185,7 @@ public class MainWindowController {
                         cellData.getValue().getDecano() != null ? cellData.getValue().getDecano().getNombres() + " " + cellData.getValue().getDecano().getApellidos() : "Sin decano"
                 )
         );
-        facultadesTable.setItems(facultadesData);
+        facultadesTable.setItems(listaDeFacultades);
 
         // Inscripciones
         idCol.setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -224,7 +224,8 @@ public class MainWindowController {
         personaNombresCol.setCellValueFactory(new PropertyValueFactory<>("nombres"));
         personaApellidosCol.setCellValueFactory(new PropertyValueFactory<>("apellidos"));
         personaEmailCol.setCellValueFactory(new PropertyValueFactory<>("email"));
-        personasTable.setItems(personasData); // Vincula la lista observable
+        // ✅ CAMBIO: Vincula la tabla DIRECTAMENTE a la lista observable del servicio
+        personasTable.setItems(servicioPersonas.listado);
 
         personasTable.getSelectionModel().selectedItemProperty().addListener(
                 (obs, old, nuev) -> eliminarPersonaBtn.setDisable(nuev == null)
@@ -250,20 +251,27 @@ public class MainWindowController {
         asignacionesTable.setItems(asignacionesData);
 
         // Actualiza la tabla de personas con los datos del servicio
-        personasData.setAll(servicioPersonas.listado);
+      //  personasData.setAll(servicioPersonas.listado);
 
-        facultadesTable.setItems(facultadesData);
-        facultadesData.setAll(listaDeFacultades);
+        //facultadesTable.setItems(facultadesData);
+       // facultadesData.setAll(listaDeFacultades);
 
-        programasTable.setItems(programasData);
-        programasData.setAll(listaDeProgramas);
+        //programasTable.setItems(programasData);
+        //programasData.setAll(listaDeProgramas);
     }
 
     private List<Persona> getPersonasYProfesores() {
         List<Persona> disponibles = new ArrayList<>();
 
-        // Añadir todas las personas del servicio de personas
-        disponibles.addAll(servicioPersonas.listado);
+        // ✅ MODIFICACIÓN: Filtrar personas para EXCLUIR a los estudiantes
+        for (Persona p : servicioPersonas.listado) {
+            // Verifica si el ID de esta persona NO está en la lista de estudiantes
+            boolean esEstudiante = listaDeEstudiantes.stream()
+                    .anyMatch(estudiante -> estudiante.getId() == p.getId());
+            if (!esEstudiante) {
+                disponibles.add(p);
+            }
+        }
 
         // Añadir profesores (son Personas, pero como Profesor hereda de Persona)
         for (Profesor p : listaDeProfesores) {
@@ -285,9 +293,9 @@ public class MainWindowController {
             servicioPersonas.eliminar(seleccionada.getId());
 
             // ✅ Actualizar la tabla
-            personasData.remove(seleccionada);
+            //personasData.remove(seleccionada);
             // O si prefieres recargar todo:
-            personasData.setAll(servicioPersonas.listado);
+          //  personasData.setAll(servicioPersonas.listado);
 
             System.out.println("Persona eliminada: ID=" + seleccionada.getId() + ", " + seleccionada.getNombres() + " " + seleccionada.getApellidos());
         }
@@ -404,8 +412,8 @@ public class MainWindowController {
 
                 guardarNuevoProgramaEnDB(nuevo);
 
+                // ✅ Agrega directamente a la ObservableList. La tabla se actualiza sola.
                 listaDeProgramas.add(nuevo);
-                cargarTodosLosDatos();
 
                 System.out.println("Programa agregado: " + nuevo);
             }
@@ -460,11 +468,12 @@ public class MainWindowController {
                 Facultad nueva = new Facultad(id, nombre);
                 nueva.setDecano(decano);
 
-
                 guardarNuevaFacultadEnDB(nueva);
 
+                // ✅ Agrega directamente a la ObservableList. La tabla se actualiza sola.
                 listaDeFacultades.add(nueva);
-                cargarTodosLosDatos();
+
+                System.out.println("Facultad agregada: " + nueva);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -517,14 +526,18 @@ public class MainWindowController {
                 String apellidos = apellidosField.getText().trim();
                 String email = emailField.getText().trim();
 
+                // ... creación de 'nueva' ...
+
                 Persona nueva = new Persona(id, nombres, apellidos, email);
+                DatabaseManager.guardarPersona(nueva);
+                servicioPersonas.inscribir(nueva); // ← Esto actualiza la ObservableList del servicio
 
-
-                guardarPersonaEnDB(nueva);
-
-
-                servicioPersonas.inscribir(nueva);
-                personasData.setAll(servicioPersonas.listado);
+                // ✅ ELIMINA estas líneas, ya no son necesarias:
+                // personasData.setAll(servicioPersonas.listado);
+                // System.out.println("Listado actual en memoria:");
+                // for (Persona p : servicioPersonas.listado) {
+                //     System.out.println(" - " + p);
+                // }
 
                 System.out.println("Persona agregada y guardada en DB: " + nueva);
             }
@@ -791,22 +804,19 @@ public class MainWindowController {
         }
     }
 
-    private void guardarPersonaEnDB(Persona persona) {
-        String sql = "MERGE INTO PERSONA (id, nombres, apellidos, email) KEY(id) VALUES (?, ?, ?, ?)";
-        try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            pstmt.setDouble(1, persona.getId());
-            pstmt.setString(2, persona.getNombres());
-            pstmt.setString(3, persona.getApellidos());
-            pstmt.setString(4, persona.getEmail());
 
-            pstmt.executeUpdate();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+    // ✅ Getter para que la consola pueda acceder al mismo servicio
+    public InscripcionesPersonas getServicioPersonas() {
+        return this.servicioPersonas;
     }
 
+    public ObservableList<Facultad> getListaDeFacultades() {
+        return this.listaDeFacultades;
+    }
 
+    // ✅ Getter para que la consola pueda acceder a la lista observable de programas
+    public ObservableList<Programa> getListaDeProgramas() {
+        return this.listaDeProgramas;
+    }
 }

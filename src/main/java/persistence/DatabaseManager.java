@@ -1,9 +1,10 @@
 package persistence;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import model.Persona;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DatabaseManager {
     private static final String DB_URL = "jdbc:h2:./data/universityDB";
@@ -88,8 +89,50 @@ public class DatabaseManager {
             stmt.execute("MERGE INTO CURSO(id, nombre,programa_id,activo) KEY(id) VALUES (902, 'Bases de Datos', 111, true )");
             stmt.execute("MERGE INTO CURSO(id, nombre,programa_id,activo) KEY(id) VALUES (903, 'Cálculo Integral', 111, true )");
 
+
+
+
         } catch (SQLException e) {
             System.err.println("Error al inicializar la base de datos: " + e.getMessage());
         }
+    }
+
+    // 🔹 Guardar persona (centralizado)
+    public static void guardarPersona(Persona persona) {
+        String sql = "MERGE INTO PERSONA (id, nombres, apellidos, email) KEY(id) VALUES (?, ?, ?, ?)";
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setDouble(1, persona.getId());
+            pstmt.setString(2, persona.getNombres());
+            pstmt.setString(3, persona.getApellidos());
+            pstmt.setString(4, persona.getEmail());
+
+            pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // 🔹 Cargar todas las personas
+    public static List<Persona> cargarPersonas() {
+        List<Persona> personas = new ArrayList<>();
+        String sql = "SELECT id, nombres, apellidos, email FROM PERSONA";
+        try (Connection conn = getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            while (rs.next()) {
+                double id = rs.getDouble("id");
+                String nombres = rs.getString("nombres");
+                String apellidos = rs.getString("apellidos");
+                String email = rs.getString("email");
+                personas.add(new Persona(id, nombres, apellidos, email));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return personas;
     }
 }
