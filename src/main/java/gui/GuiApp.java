@@ -12,9 +12,7 @@ import services.CursosInscritos;
 import services.InscripcionesPersonas;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.Scanner;
 
 public class GuiApp extends Application {
@@ -22,10 +20,14 @@ public class GuiApp extends Application {
     /**
      * The main method now only launches the GUI.
      */
-    // ✅ MANTÉN esta declaración. Es la variable que usarán los métodos de consola.
+
     public static InscripcionesPersonas servicioPersonas;
     public static ObservableList<Facultad> listaDeFacultades;
     public static ObservableList<Programa> listaDeProgramas;
+    public static ObservableList<Curso> listaDeCursos;
+    public static ObservableList<Inscripcion> inscripcionesData;
+    public static ObservableList<Estudiante> listaDeEstudiantes;
+
 
     public static void main(String[] args) {
         launch(args);
@@ -43,9 +45,13 @@ public class GuiApp extends Application {
         Parent root = loader.load();
 
         MainWindowController controller = loader.getController();
-        servicioPersonas = controller.getServicioPersonas(); // ← Esto asigna la instancia que ya existe en el controlador
+        servicioPersonas = controller.getServicioPersonas();
         listaDeFacultades = controller.getListaDeFacultades();
         listaDeProgramas = controller.getListaDeProgramas();
+        inscripcionesData = controller.getInscripcionesData();
+        listaDeEstudiantes = controller.getListaDeEstudiantes();
+
+        listaDeCursos = controller.getListaDeCursos();
         primaryStage.setTitle("Gestor Universitario");
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
@@ -82,23 +88,22 @@ public class GuiApp extends Application {
 
             switch (opcionPrincipal) {
                 case "1":
-                    // --- SUBMENÚ: PERSONAS ---
+
                     gestionarPersonas(scanner);
                     break;
                 case "2":
                     gestionarFacultades(scanner);
-                    // Aquí iría la lógica futura para facultades
+
                     break;
                 case "3":
                     gestionarProgramas(scanner);
                     break;
                 case "4":
-                    System.out.println("\n--- Módulo de Cursos (Próximamente) ---");
-                    // Aquí iría la lógica futura para cursos
+                    gestionarCursos(scanner);
+
                     break;
                 case "5":
-                    System.out.println("\n--- Módulo de Inscripciones (Próximamente) ---");
-                    // Aquí iría la lógica futura para inscripciones
+                    gestionarInscripciones(scanner);
                     break;
                 case "6":
                     running = false;
@@ -132,7 +137,7 @@ public class GuiApp extends Application {
                     listarPersonas();
                     break;
                 case "3":
-                    enSubMenu = false; // Sale del submenú y vuelve al menú principal
+                    enSubMenu = false;
                     System.out.println("Regresando al menú principal...");
                     break;
                 default:
@@ -191,15 +196,14 @@ public class GuiApp extends Application {
 
             Persona nueva = new Persona(id, nombres, apellidos, email);
 
-            // Guarda en memoria y en la DB
             servicioPersonas.inscribir(nueva);
-            DatabaseManager.guardarPersona(nueva); // 👈 Si ya tienes este método implementado
+            DatabaseManager.guardarPersona(nueva);
 
-            System.out.println("✅ Persona inscrita correctamente: " + nueva);
+            System.out.println("Persona inscrita correctamente: " + nueva);
         } catch (NumberFormatException e) {
-            System.out.println("❌ Error: El ID debe ser un número válido.");
+            System.out.println(" Error: El ID debe ser un número válido.");
         } catch (Exception e) {
-            System.out.println("❌ Error al inscribir persona: " + e.getMessage());
+            System.out.println("Error al inscribir persona: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -212,13 +216,13 @@ public class GuiApp extends Application {
             System.out.print("Ingrese Nombre de la Facultad: ");
             String nombre = scanner.nextLine();
 
-            // Para simplificar, asignaremos un decano existente por ID.
+
             System.out.print("Ingrese ID del Decano ");
             double decanoId = Double.parseDouble(scanner.nextLine());
 
             Persona decano = null;
             if (decanoId != 0) {
-                // Buscar decano en servicioPersonas
+
                 for (Persona p : servicioPersonas.listado) {
                     if (p.getId() == decanoId) {
                         decano = p;
@@ -226,7 +230,7 @@ public class GuiApp extends Application {
                     }
                 }
                 if (decano == null) {
-                    System.out.println("❌ Advertencia: No se encontró una persona con ese ID. La facultad se creará sin decano.");
+                    System.out.println("Advertencia: No se encontró una persona con ese ID. La facultad se creará sin decano.");
                 }
             }
 
@@ -235,17 +239,17 @@ public class GuiApp extends Application {
                 nueva.setDecano(decano);
             }
 
-            // Guardar en DB
+
             guardarNuevaFacultadEnDB(nueva);
 
-            // ✅ Agregar a la lista observable compartida. ¡La GUI se actualizará automáticamente!
+
             listaDeFacultades.add(nueva);
 
-            System.out.println("✅ Facultad agregada correctamente: " + nueva);
+            System.out.println("Facultad agregada correctamente: " + nueva);
         } catch (NumberFormatException e) {
-            System.out.println("❌ Error: El ID debe ser un número válido.");
+            System.out.println(" Error: El ID debe ser un número válido.");
         } catch (Exception e) {
-            System.out.println("❌ Error al agregar facultad: " + e.getMessage());
+            System.out.println("Error al agregar facultad: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -254,7 +258,7 @@ public class GuiApp extends Application {
         if (listaDeFacultades.isEmpty()) {
             System.out.println("No hay facultades registradas.");
         } else {
-            System.out.println("📋 Facultades registradas:");
+            System.out.println("Facultades registradas:");
             for (Facultad f : listaDeFacultades) {
                 String decanoStr = f.getDecano() != null ? f.getDecano().getNombres() + " " + f.getDecano().getApellidos() : "Sin decano";
                 System.out.println(" - ID: " + f.getId() + ", Nombre: " + f.getNombre() + ", Decano: " + decanoStr);
@@ -277,21 +281,18 @@ public class GuiApp extends Application {
             }
 
             if (facultadAEliminar == null) {
-                System.out.println("❌ No se encontró una facultad con ese ID.");
+                System.out.println("No se encontró una facultad con ese ID.");
                 return;
             }
 
-            // ✅ Eliminar de la lista observable. ¡La GUI se actualizará automáticamente!
             listaDeFacultades.remove(facultadAEliminar);
 
-            // Opcional: Eliminar de la base de datos (debes implementar este método en DatabaseManager si lo deseas)
-            // eliminarFacultadDeDB(id);
 
-            System.out.println("✅ Facultad con ID " + id + " eliminada correctamente.");
+            System.out.println("Facultad con ID " + id + " eliminada correctamente.");
         } catch (NumberFormatException e) {
-            System.out.println("❌ Error: El ID debe ser un número válido.");
+            System.out.println(" Error: El ID debe ser un número válido.");
         } catch (Exception e) {
-            System.out.println("❌ Error al eliminar facultad: " + e.getMessage());
+            System.out.println("Error al eliminar facultad: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -379,7 +380,7 @@ public class GuiApp extends Application {
                     }
                 }
                 if (facultad == null) {
-                    System.out.println("❌ Advertencia: No se encontró una facultad con ese ID. El programa se creará sin facultad.");
+                    System.out.println("Advertencia: No se encontró una facultad con ese ID. El programa se creará sin facultad.");
                 }
             }
 
@@ -388,16 +389,15 @@ public class GuiApp extends Application {
             // Guardar en DB
             guardarNuevoProgramaEnDB(nuevo);
 
-            // ✅ Agregar a la lista observable compartida. ¡La GUI se actualizará automáticamente!
             listaDeProgramas.add(nuevo);
 
-            System.out.println("✅ Programa agregado correctamente: " + nuevo);
+            System.out.println("Programa agregado correctamente: " + nuevo);
         } catch (NumberFormatException e) {
-            System.out.println("❌ Error: El ID o la duración deben ser números válidos.");
+            System.out.println("Error: El ID o la duración deben ser números válidos.");
         } catch (IllegalArgumentException e) {
-            System.out.println("❌ Error: Formato de fecha inválido. Use YYYY-MM-DD.");
+            System.out.println("Error: Formato de fecha inválido. Use YYYY-MM-DD.");
         } catch (Exception e) {
-            System.out.println("❌ Error al agregar programa: " + e.getMessage());
+            System.out.println("Error al agregar programa: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -406,7 +406,7 @@ public class GuiApp extends Application {
         if (listaDeProgramas.isEmpty()) {
             System.out.println("No hay programas registrados.");
         } else {
-            System.out.println("📋 Programas registrados:");
+            System.out.println("Programas registrados:");
             for (Programa p : listaDeProgramas) {
                 String facultadStr = p.getFacultad() != null ? p.getFacultad().getNombre() : "Sin facultad";
                 System.out.println(" - ID: " + p.getId() +
@@ -433,21 +433,18 @@ public class GuiApp extends Application {
             }
 
             if (programaAEliminar == null) {
-                System.out.println("❌ No se encontró un programa con ese ID.");
+                System.out.println("No se encontró un programa con ese ID.");
                 return;
             }
 
-            // ✅ Eliminar de la lista observable. ¡La GUI se actualizará automáticamente!
             listaDeProgramas.remove(programaAEliminar);
 
-            // Opcional: Eliminar de la base de datos (debes implementar este método en DatabaseManager si lo deseas)
-            // eliminarProgramaDeDB(id);
 
-            System.out.println("✅ Programa con ID " + id + " eliminado correctamente.");
+            System.out.println("Programa con ID " + id + " eliminado correctamente.");
         } catch (NumberFormatException e) {
-            System.out.println("❌ Error: El ID debe ser un número válido.");
+            System.out.println("Error: El ID debe ser un número válido.");
         } catch (Exception e) {
-            System.out.println("❌ Error al eliminar programa: " + e.getMessage());
+            System.out.println("Error al eliminar programa: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -475,12 +472,338 @@ public class GuiApp extends Application {
         if (servicioPersonas.listado.isEmpty()) {
             System.out.println("No hay personas registradas.");
         } else {
-            System.out.println("📋 Personas registradas:");
+            System.out.println("Personas registradas:");
             for (Persona p : servicioPersonas.listado) {
                 System.out.println(" - " + p);
             }
         }
     }
 
+
+    // --- Método privado para manejar el submenú de Cursos ---
+    private static void gestionarCursos(Scanner scanner) {
+        boolean enSubMenu = true;
+        while (enSubMenu) {
+            System.out.println("\n=============================================");
+            System.out.println("        --- Gestión de Cursos ---            ");
+            System.out.println("=============================================");
+            System.out.println("1. Agregar Curso");
+            System.out.println("2. Listar Cursos");
+            System.out.println("3. Eliminar Curso");
+            System.out.println("4. Volver al Menú Principal");
+            System.out.print("Seleccione una opción: ");
+
+            String opcion = scanner.nextLine();
+
+            switch (opcion) {
+                case "1":
+                    agregarCursoConsola(scanner);
+                    break;
+                case "2":
+                    listarCursos();
+                    break;
+                case "3":
+                    eliminarCursoConsola(scanner);
+                    break;
+                case "4":
+                    enSubMenu = false;
+                    System.out.println("Regresando al menú principal...");
+                    break;
+                default:
+                    System.out.println("Opción inválida, intente de nuevo.");
+            }
+        }
+    }
+
+    private static void agregarCursoConsola(Scanner scanner) {
+        try {
+            System.out.print("Ingrese ID del Curso (número entero): ");
+            int id = Integer.parseInt(scanner.nextLine());
+
+            System.out.print("Ingrese Nombre del Curso: ");
+            String nombre = scanner.nextLine();
+
+            System.out.print("¿El curso está activo? (s/n): ");
+            String activoStr = scanner.nextLine().trim().toLowerCase();
+            boolean activo = activoStr.equals("s") || activoStr.equals("si") || activoStr.equals("y") || activoStr.equals("yes");
+
+            // Para simplificar, asignaremos un programa existente por ID.
+            System.out.print("Ingrese ID del Programa (número, 0 si no tiene): ");
+            double programaId = Double.parseDouble(scanner.nextLine());
+
+            Programa programa = null;
+            if (programaId != 0) {
+                // Buscar programa en listaDeProgramas
+                for (Programa p : listaDeProgramas) {
+                    if (p.getId() == programaId) {
+                        programa = p;
+                        break;
+                    }
+                }
+                if (programa == null) {
+                    System.out.println("Advertencia: No se encontró un programa con ese ID. El curso se creará sin programa.");
+                }
+            }
+
+            Curso nuevo = new Curso(id, nombre, activo);
+            if (programa != null) {
+                nuevo.setPrograma(programa);
+            }
+
+            // Guardar en DB
+            guardarNuevoCursoEnDB(nuevo);
+
+            listaDeCursos.add(nuevo);
+
+            System.out.println("Curso agregado correctamente: " + nuevo);
+        } catch (NumberFormatException e) {
+            System.out.println("Error: El ID del curso debe ser un número entero válido, y el ID del programa un número válido.");
+        } catch (Exception e) {
+            System.out.println(" Error al agregar curso: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private static void listarCursos() {
+        if (listaDeCursos.isEmpty()) {
+            System.out.println("No hay cursos registrados.");
+        } else {
+            System.out.println("Cursos registrados:");
+            for (Curso c : listaDeCursos) {
+                String programaStr = c.getPrograma() != null ? c.getPrograma().getNombre() : "Sin programa";
+                System.out.println(" - ID: " + c.getId() +
+                        ", Nombre: " + c.getNombre() +
+                        ", Activo: " + (c.isActivo() ? "Sí" : "No") +
+                        ", Programa: " + programaStr);
+            }
+        }
+    }
+
+    private static void eliminarCursoConsola(Scanner scanner) {
+        try {
+            System.out.print("Ingrese ID del Curso a eliminar: ");
+            int id = Integer.parseInt(scanner.nextLine());
+
+            // Buscar y eliminar de la lista observable
+            Curso cursoAEliminar = null;
+            for (Curso c : listaDeCursos) {
+                if (c.getId() == id) {
+                    cursoAEliminar = c;
+                    break;
+                }
+            }
+
+            if (cursoAEliminar == null) {
+                System.out.println("No se encontró un curso con ese ID.");
+                return;
+            }
+
+            listaDeCursos.remove(cursoAEliminar);
+
+
+
+            System.out.println("Curso con ID " + id + " eliminado correctamente.");
+        } catch (NumberFormatException e) {
+            System.out.println("Error: El ID debe ser un número entero válido.");
+        } catch (Exception e) {
+            System.out.println("Error al eliminar curso: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    // Método auxiliar para guardar curso en DB (copiado de MainWindowController)
+    private static void guardarNuevoCursoEnDB(Curso curso) {
+        String sqlCurso = "MERGE INTO CURSO (id, nombre, programa_id, activo) KEY(id) VALUES (?, ?, ?, ?)";
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sqlCurso)) {
+
+            pstmt.setInt(1, curso.getId());
+            pstmt.setString(2, curso.getNombre());
+            pstmt.setDouble(3, curso.getPrograma() != null ? curso.getPrograma().getId() : 0);
+            pstmt.setBoolean(4, curso.isActivo());
+
+            pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // --- Método privado para manejar el submenú de Inscripciones ---
+    private static void gestionarInscripciones(Scanner scanner) {
+        boolean enSubMenu = true;
+        while (enSubMenu) {
+            System.out.println("\n=============================================");
+            System.out.println("        --- Gestión de Inscripciones ---     ");
+            System.out.println("=============================================");
+            System.out.println("1. Realizar Inscripción");
+            System.out.println("2. Listar Inscripciones");
+            System.out.println("3. Eliminar Inscripción");
+            System.out.println("4. Volver al Menú Principal");
+            System.out.print("Seleccione una opción: ");
+
+            String opcion = scanner.nextLine();
+
+            switch (opcion) {
+                case "1":
+                    realizarInscripcionConsola(scanner);
+                    break;
+                case "2":
+                    listarInscripciones();
+                    break;
+                case "3":
+                    eliminarInscripcionConsola(scanner);
+                    break;
+                case "4":
+                    enSubMenu = false;
+                    System.out.println("Regresando al menú principal...");
+                    break;
+                default:
+                    System.out.println("Opción inválida, intente de nuevo.");
+            }
+        }
+    }
+
+    private static void realizarInscripcionConsola(Scanner scanner) {
+        try {
+
+            System.out.print("Ingrese ID del Estudiante: ");
+            double estudianteId = Double.parseDouble(scanner.nextLine());
+
+            System.out.print("Ingrese ID del Curso: ");
+            int cursoId = Integer.parseInt(scanner.nextLine());
+
+            System.out.print("Ingrese Año: ");
+            int ano = Integer.parseInt(scanner.nextLine());
+
+            System.out.print("Ingrese Semestre: ");
+            int semestre = Integer.parseInt(scanner.nextLine());
+
+            // Buscar estudiante y curso
+            Estudiante estudiante = null;
+            for (Estudiante e : listaDeEstudiantes) {
+                if (e.getId() == estudianteId) {
+                    estudiante = e;
+                    break;
+                }
+            }
+
+            Curso curso = null;
+            for (Curso c : listaDeCursos) {
+                if (c.getId() == cursoId) {
+                    curso = c;
+                    break;
+                }
+            }
+
+            if (estudiante == null) {
+                System.out.println("Error: No se encontró un estudiante con ese ID.");
+                return;
+            }
+
+            if (curso == null) {
+                System.out.println("Error: No se encontró un curso con ese ID.");
+                return;
+            }
+
+            Inscripcion nueva = new Inscripcion(estudiante, curso, ano, semestre);
+
+
+            guardarNuevaInscripcionEnDB(nueva);
+
+
+            inscripcionesData.add(nueva);
+
+            System.out.println("Inscripción realizada correctamente: " + nueva);
+        } catch (NumberFormatException e) {
+            System.out.println("Error: Los IDs, año y semestre deben ser números válidos.");
+        } catch (Exception e) {
+            System.out.println("Error al realizar inscripción: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private static void listarInscripciones() {
+        if (inscripcionesData.isEmpty()) {
+            System.out.println("No hay inscripciones registradas.");
+        } else {
+            System.out.println("Inscripciones registradas:");
+            for (Inscripcion i : inscripcionesData) {
+                System.out.println(" - ID: " + i.getId() +
+                        ", Estudiante: " + i.getEstudiante().getNombres() + " " + i.getEstudiante().getApellidos() +
+                        ", Curso: " + i.getCurso().getNombre() +
+                        ", Año: " + i.getAno() +
+                        ", Semestre: " + i.getSemestre());
+            }
+        }
+    }
+
+    private static void eliminarInscripcionConsola(Scanner scanner) {
+        try {
+            System.out.print("Ingrese ID de la Inscripción a eliminar: ");
+            int id = Integer.parseInt(scanner.nextLine());
+
+            // Buscar y eliminar de la lista observable
+            Inscripcion inscripcionAEliminar = null;
+            for (Inscripcion i : inscripcionesData) {
+                if (i.getId() == id) {
+                    inscripcionAEliminar = i;
+                    break;
+                }
+            }
+
+            if (inscripcionAEliminar == null) {
+                System.out.println("No se encontró una inscripción con ese ID.");
+                return;
+            }
+
+            // Eliminar de la lista observable. ¡La GUI se actualizará automáticamente!
+            inscripcionesData.remove(inscripcionAEliminar);
+
+            // Opcional: Eliminar de la base de datos
+            eliminarInscripcionDeDB(id);
+
+            System.out.println("Inscripción con ID " + id + " eliminada correctamente.");
+        } catch (NumberFormatException e) {
+            System.out.println("Error: El ID debe ser un número entero válido.");
+        } catch (Exception e) {
+            System.out.println("Error al eliminar inscripción: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    // Método auxiliar para guardar inscripción en DB
+    private static void guardarNuevaInscripcionEnDB(Inscripcion inscripcion) {
+        String sql = "INSERT INTO INSCRIPCION (ano, semestre, estudiante_id, curso_id) VALUES (?, ?, ?, ?)";
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+            pstmt.setInt(1, inscripcion.getAno());
+            pstmt.setInt(2, inscripcion.getSemestre());
+            pstmt.setDouble(3, inscripcion.getEstudiante().getId());
+            pstmt.setInt(4, inscripcion.getCurso().getId());
+
+            pstmt.executeUpdate();
+
+
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Método auxiliar para eliminar inscripción de DB
+    private static void eliminarInscripcionDeDB(int id) {
+        String sql = "DELETE FROM INSCRIPCION WHERE id = ?";
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, id);
+            pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
 }
