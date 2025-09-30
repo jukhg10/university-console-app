@@ -74,15 +74,15 @@ public class GuiApp extends Application {
         while (running) {
             // --- MENÚ PRINCIPAL ---
             System.out.println("\n=============================================");
-            System.out.println("        --- MENÚ PRINCIPAL UNIVERSIDAD ---   ");
+            System.out.println("        --- MENU PRINCIPAL UNIVERSIDAD ---   ");
             System.out.println("=============================================");
-            System.out.println("1. Gestión de Personas");
-            System.out.println("2. Gestión de Facultades");
-            System.out.println("3. Gestión de Programas");
-            System.out.println("4. Gestión de Cursos");
-            System.out.println("5. Gestión de Inscripciones");
+            System.out.println("1. Gestion de Personas");
+            System.out.println("2. Gestion de Facultades");
+            System.out.println("3. Gestion de Programas");
+            System.out.println("4. Gestion de Cursos");
+            System.out.println("5. Gestion de Inscripciones");
             System.out.println("6. Salir");
-            System.out.print("Seleccione una opción: ");
+            System.out.print("Seleccione una opcion: ");
 
             String opcionPrincipal = scanner.nextLine();
 
@@ -107,10 +107,10 @@ public class GuiApp extends Application {
                     break;
                 case "6":
                     running = false;
-                    System.out.println("Saliendo del menú de consola...");
+                    System.out.println("Saliendo del meno de consola...");
                     break;
                 default:
-                    System.out.println("Opción inválida, intente de nuevo.");
+                    System.out.println("Opcion invalida, intente de nuevo.");
             }
         }
     }
@@ -120,12 +120,12 @@ public class GuiApp extends Application {
         boolean enSubMenu = true;
         while (enSubMenu) {
             System.out.println("\n=============================================");
-            System.out.println("        --- Gestión de Personas ---          ");
+            System.out.println("        --- Gestion de Personas ---          ");
             System.out.println("=============================================");
             System.out.println("1. Inscribir Persona");
             System.out.println("2. Listar Personas");
-            System.out.println("3. Volver al Menú Principal");
-            System.out.print("Seleccione una opción: ");
+            System.out.println("3. Volver al Menu Principal");
+            System.out.print("Seleccione una opcion: ");
 
             String opcion = scanner.nextLine();
 
@@ -138,10 +138,10 @@ public class GuiApp extends Application {
                     break;
                 case "3":
                     enSubMenu = false;
-                    System.out.println("Regresando al menú principal...");
+                    System.out.println("Regresando al menu principal...");
                     break;
                 default:
-                    System.out.println("Opción inválida, intente de nuevo.");
+                    System.out.println("Opcion invalida, intente de nuevo.");
             }
         }
     }
@@ -150,13 +150,13 @@ public class GuiApp extends Application {
         boolean enSubMenu = true;
         while (enSubMenu) {
             System.out.println("\n=============================================");
-            System.out.println("        --- Gestión de Facultades ---        ");
+            System.out.println("        --- Gestion de Facultades ---        ");
             System.out.println("=============================================");
             System.out.println("1. Agregar Facultad");
             System.out.println("2. Listar Facultades");
             System.out.println("3. Eliminar Facultad");
-            System.out.println("4. Volver al Menú Principal");
-            System.out.print("Seleccione una opción: ");
+            System.out.println("4. Volver al Menu Principal");
+            System.out.print("Seleccione una opcion: ");
 
             String opcion = scanner.nextLine();
 
@@ -172,17 +172,17 @@ public class GuiApp extends Application {
                     break;
                 case "4":
                     enSubMenu = false;
-                    System.out.println("Regresando al menú principal...");
+                    System.out.println("Regresando al menu principal...");
                     break;
                 default:
-                    System.out.println("Opción inválida, intente de nuevo.");
+                    System.out.println("Opcion invaalida, intente de nuevo.");
             }
         }
     }
 
     private static void inscribirPersonaConsola(Scanner scanner) {
         try {
-            System.out.print("Ingrese ID (número): ");
+            System.out.print("Ingrese ID (numero): ");
             double id = Double.parseDouble(scanner.nextLine());
 
             System.out.print("Ingrese Nombres: ");
@@ -201,7 +201,7 @@ public class GuiApp extends Application {
 
             System.out.println("Persona inscrita correctamente: " + nueva);
         } catch (NumberFormatException e) {
-            System.out.println(" Error: El ID debe ser un número válido.");
+            System.out.println(" Error: El ID debe ser un numero válido.");
         } catch (Exception e) {
             System.out.println("Error al inscribir persona: " + e.getMessage());
             e.printStackTrace();

@@ -2,55 +2,54 @@ package services;
 
 import model.Inscripcion;
 import persistence.InscripcionDAO;
+import persistence.InscripcionDAOInterface;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class CursosInscritos implements Servicios {
-    private List<Inscripcion> listado;
-    private final InscripcionDAO dao;
+    private List<Inscripcion> lista;
+    private final InscripcionDAOInterface dao;
 
-    public CursosInscritos() {
-        this.listado = new ArrayList<>();
-        this.dao = new InscripcionDAO();
+    public CursosInscritos(InscripcionDAOInterface dao) {
+        this.dao = dao;
+        this.lista = dao.cargarInscripciones();
     }
-    
-    // Métodos de gestión
-    public void inscribirCurso(Inscripcion i) {
-        dao.guardarInformacion(i); // Guarda en DB y obtiene el ID
-        this.listado.add(i);
+
+    public void inscribir(Inscripcion inscripcion) {
+        dao.guardarInscripcion(inscripcion);
+        this.lista.add(inscripcion);
     }
-    
-    public void eliminar(int idInscripcion) {
-        dao.eliminar(idInscripcion);
-        listado.removeIf(insc -> insc.getId() == idInscripcion);
+
+    public void eliminar(int id) {
+        dao.eliminarInscripcion(id);
+        this.lista.removeIf(i -> i.getId() == id);
     }
-    
+
     public void cargarDatos() {
-        this.listado = dao.cargarDatos();
+        this.lista = dao.cargarInscripciones();
     }
 
-    public List<Inscripcion> imprimirListaCompleta() {
-    return new ArrayList<>(this.listado);
+    public List<Inscripcion> obtenerLista() {
+        return new ArrayList<>(this.lista);
     }
-    
-    // Métodos de la interfaz Servicios
+
     @Override
     public String imprimirPosicion(int posicion) {
-        if (posicion >= 0 && posicion < listado.size()) {
-            return "Posición " + posicion + ": " + listado.get(posicion).toString();
+        if (posicion >= 0 && posicion < lista.size()) {
+            return "Posición " + posicion + ": " + lista.get(posicion).toString();
         }
         return "Posición inválida.";
     }
 
     @Override
     public int cantidadActual() {
-        return listado.size();
+        return lista.size();
     }
 
     @Override
     public List<String> imprimirLista() {
-        return listado.stream().map(Inscripcion::toString).collect(Collectors.toList());
+        return lista.stream().map(Inscripcion::toString).collect(Collectors.toList());
     }
 }

@@ -9,6 +9,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import model.*;
 import persistence.DatabaseManager;
+import persistence.InscripcionDAO;
 import services.CursosInscritos;
 import services.CursosProfesores;
 import services.InscripcionesPersonas;
@@ -73,7 +74,6 @@ public class MainWindowController {
     @FXML private TableColumn<CursoProfesor, Integer> asigSemestreCol;
     @FXML private Button eliminarAsignacionBtn;
 
-
     // --- Personas ---
     @FXML private Button agregarPersonaBtn;
     @FXML private TableView<Persona> personasTable;
@@ -84,7 +84,6 @@ public class MainWindowController {
 
     // Lista observable para Personas
     //private ObservableList<Persona> personasData;
-
 
     // --- Facultades ---
     @FXML private Button agregarFacultadBtn;
@@ -105,7 +104,6 @@ public class MainWindowController {
     @FXML private TableColumn<Programa, Double> programaDuracionCol;
     @FXML private TableColumn<Programa, String> programaFechaCol;
     @FXML private TableColumn<Programa, String> programaFacultadCol;
-
     private ObservableList<Programa> listaDeProgramas;
     //private List<Programa> listaDeProgramas;
 
@@ -119,31 +117,24 @@ public class MainWindowController {
 
     //private ObservableList<Curso> cursosData;
 
-
     @FXML
     public void initialize() {
-
         listaDeCursos = FXCollections.observableArrayList();
         //cursosData = FXCollections.observableArrayList();
-
-        servicioInscripciones = new CursosInscritos();
+        servicioInscripciones = new CursosInscritos(new InscripcionDAO());
         servicioCursosProfesores = new CursosProfesores();
         servicioPersonas = new InscripcionesPersonas();
 
         this.listaDeProfesores = crearProfesoresDePrueba();
         this.listaDeCursos = FXCollections.observableArrayList(crearCursosDePrueba());
         this.listaDeEstudiantes = crearEstudiantesDePrueba();
-
         inscripcionesData = FXCollections.observableArrayList();
         profesoresData = FXCollections.observableArrayList();
         asignacionesData = FXCollections.observableArrayList();
         estudiantesData = FXCollections.observableArrayList();
         //personasData = FXCollections.observableArrayList(); //
-
-
         listaDeFacultades = FXCollections.observableArrayList();
-       // facultadesData = FXCollections.observableArrayList();
-
+        // facultadesData = FXCollections.observableArrayList();
         listaDeProgramas = FXCollections.observableArrayList();
         //programasData = FXCollections.observableArrayList();
 
@@ -164,7 +155,6 @@ public class MainWindowController {
                 new SimpleStringProperty(cellData.getValue().isActivo() ? "Sí" : "No")
         );
         cursosTable.setItems(listaDeCursos);
-
         programaIdCol.setCellValueFactory(new PropertyValueFactory<>("id"));
         programaNombreCol.setCellValueFactory(new PropertyValueFactory<>("nombre"));
         programaDuracionCol.setCellValueFactory(new PropertyValueFactory<>("duracion"));
@@ -177,7 +167,6 @@ public class MainWindowController {
                 )
         );
         programasTable.setItems(listaDeProgramas);
-
         facultadIdCol.setCellValueFactory(new PropertyValueFactory<>("id"));
         facultadNombreCol.setCellValueFactory(new PropertyValueFactory<>("nombre"));
         facultadDecanoCol.setCellValueFactory(cellData ->
@@ -218,42 +207,31 @@ public class MainWindowController {
         asigSemestreCol.setCellValueFactory(new PropertyValueFactory<>("semestre"));
         asignacionesTable.getSelectionModel().selectedItemProperty().addListener((obs, old, anew) -> eliminarAsignacionBtn.setDisable(anew == null));
 
-
         // Personas
         personaIdCol.setCellValueFactory(new PropertyValueFactory<>("id"));
         personaNombresCol.setCellValueFactory(new PropertyValueFactory<>("nombres"));
         personaApellidosCol.setCellValueFactory(new PropertyValueFactory<>("apellidos"));
         personaEmailCol.setCellValueFactory(new PropertyValueFactory<>("email"));
-
         personasTable.setItems(servicioPersonas.listado);
-
         personasTable.getSelectionModel().selectedItemProperty().addListener(
                 (obs, old, nuev) -> eliminarPersonaBtn.setDisable(nuev == null)
         );
     }
 
     private void cargarTodosLosDatos() {
-
-
         servicioInscripciones.cargarDatos();
-       inscripcionesData.setAll(servicioInscripciones.imprimirListaCompleta());
-      inscripcionesTable.setItems(inscripcionesData);
-
+        inscripcionesData.setAll(servicioInscripciones.obtenerLista());
+        inscripcionesTable.setItems(inscripcionesData);
         profesoresData.setAll(this.listaDeProfesores);
         profesoresTable.setItems(profesoresData);
-
         estudiantesData.setAll(this.listaDeEstudiantes);
         estudiantesTable.setItems(estudiantesData);
-
         asignacionesData.setAll(servicioCursosProfesores.getAsignaciones());
         asignacionesTable.setItems(asignacionesData);
-
-
     }
 
     private List<Persona> getPersonasYProfesores() {
         List<Persona> disponibles = new ArrayList<>();
-
         for (Persona p : servicioPersonas.listado) {
             // Verifica si el ID de esta persona NO está en la lista de estudiantes
             boolean esEstudiante = listaDeEstudiantes.stream()
@@ -262,7 +240,6 @@ public class MainWindowController {
                 disponibles.add(p);
             }
         }
-
         // Añadir profesores (son Personas, pero como Profesor hereda de Persona)
         for (Profesor p : listaDeProfesores) {
             // Evitar duplicados por ID
@@ -271,7 +248,6 @@ public class MainWindowController {
                 disponibles.add(p);
             }
         }
-
         return disponibles;
     }
 
@@ -279,15 +255,13 @@ public class MainWindowController {
     private void handleEliminarPersona() {
         Persona seleccionada = personasTable.getSelectionModel().getSelectedItem();
         if (seleccionada != null) {
-            //  Usar el método eliminar de InscripcionesPersonas
+            //  Eliminar de la base de datos
+            DatabaseManager.eliminarPersona(seleccionada.getId());
+
+            //  Usar el método eliminar de InscripcionesPersonas para actualizar la vista
             servicioPersonas.eliminar(seleccionada.getId());
 
-            //  Actualizar la tabla
-            //personasData.remove(seleccionada);
-            // O si prefieres recargar todo:
-          //  personasData.setAll(servicioPersonas.listado);
-
-            System.out.println("Persona eliminada: ID=" + seleccionada.getId() + ", " + seleccionada.getNombres() + " " + seleccionada.getApellidos());
+            System.out.println("Persona eliminada (de la base de datos y memoria): ID=" + seleccionada.getId() + ", " + seleccionada.getNombres() + " " + seleccionada.getApellidos());
         }
     }
     @FXML
@@ -295,7 +269,6 @@ public class MainWindowController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/CursoDialog.fxml"));
             DialogPane dialogPane = loader.load();
-
             TextField idField = (TextField) dialogPane.lookup("#idField");
             TextField nombreField = (TextField) dialogPane.lookup("#nombreField");
             ComboBox<Programa> programaComboBox = (ComboBox<Programa>) dialogPane.lookup("#programaComboBox");
@@ -324,7 +297,6 @@ public class MainWindowController {
             dialog.setTitle("Agregar Curso");
 
             Optional<ButtonType> result = dialog.showAndWait();
-
             if (result.isPresent() && result.get() == ButtonType.OK) {
                 int id = Integer.parseInt(idField.getText().trim());
                 String nombre = nombreField.getText().trim();
@@ -334,12 +306,12 @@ public class MainWindowController {
                 Curso nuevo = new Curso(id, nombre, activo);
                 nuevo.setPrograma(programa);
 
-                guardarNuevoCursoEnDB(nuevo);
+                // guardarNuevoCursoEnDB(nuevo); // ✅ Eliminado
 
                 // Agrega directamente a la ObservableList. La tabla se actualiza sola.
                 listaDeCursos.add(nuevo);
 
-                System.out.println("Curso agregado y guardado en DB: " + nuevo);
+                System.out.println("Curso agregado (en memoria): " + nuevo);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -400,12 +372,12 @@ public class MainWindowController {
 
                 Programa nuevo = new Programa(id, nombre, duracion, registro, facultad);
 
-                guardarNuevoProgramaEnDB(nuevo);
+                // guardarNuevoProgramaEnDB(nuevo); // ✅ Eliminado
 
                 //  Agrega directamente a la ObservableList. La tabla se actualiza sola.
                 listaDeProgramas.add(nuevo);
 
-                System.out.println("Programa agregado: " + nuevo);
+                System.out.println("Programa agregado (en memoria): " + nuevo);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -458,12 +430,12 @@ public class MainWindowController {
                 Facultad nueva = new Facultad(id, nombre);
                 nueva.setDecano(decano);
 
-                guardarNuevaFacultadEnDB(nueva);
+                // guardarNuevaFacultadEnDB(nueva); // ✅ Eliminado
 
                 //  Agrega directamente a la ObservableList. La tabla se actualiza sola.
                 listaDeFacultades.add(nueva);
 
-                System.out.println("Facultad agregada: " + nueva);
+                System.out.println("Facultad agregada (en memoria): " + nueva);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -519,12 +491,10 @@ public class MainWindowController {
                 // ... creación de 'nueva' ...
 
                 Persona nueva = new Persona(id, nombres, apellidos, email);
-                DatabaseManager.guardarPersona(nueva);
+                // DatabaseManager.guardarPersona(nueva); // ✅ Eliminado
                 servicioPersonas.inscribir(nueva); // ← Esto actualiza la ObservableList del servicio
 
-
-
-                System.out.println("Persona agregada y guardada en DB: " + nueva);
+                System.out.println("Persona agregada (en memoria): " + nueva);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -559,13 +529,11 @@ public class MainWindowController {
                     int semestre = Integer.parseInt(semestreField.getText());
                     Inscripcion nueva = new Inscripcion(est, cur, ano, semestre);
 
-                    servicioInscripciones.inscribirCurso(nueva);
+                    servicioInscripciones.inscribir(nueva);
 
                     inscripcionesData.add(nueva);
 
-
-
-                    System.out.println(" Inscripción realizada: " + nueva);
+                    System.out.println(" Inscripción realizada (en memoria): " + nueva);
                 }
             }
         } catch (Exception e) {
@@ -583,7 +551,7 @@ public class MainWindowController {
             inscripcionesData.remove(sel);
 
 
-            System.out.println(" Inscripción eliminada: ID=" + sel.getId());
+            System.out.println(" Inscripción eliminada (en memoria): ID=" + sel.getId());
         }
     }
 
@@ -598,28 +566,85 @@ public class MainWindowController {
             dialog.setTitle("Añadir Estudiante");
             Optional<ButtonType> result = dialog.showAndWait();
             if (result.isPresent() && result.get().getButtonData() == ButtonType.OK.getButtonData()) {
+                TextField idField = (TextField) dialogPane.lookup("#idField");
                 TextField nombres = (TextField) dialogPane.lookup("#nombresField");
                 TextField apellidos = (TextField) dialogPane.lookup("#apellidosField");
                 TextField email = (TextField) dialogPane.lookup("#emailField");
                 TextField codigo = (TextField) dialogPane.lookup("#codigoField");
-                double nuevoId = System.currentTimeMillis() / 1000.0;
+
+                // Obtener el ID ingresado por el usuario
+                double nuevoId = Double.parseDouble(idField.getText().trim());
+
+                // Verificar si el ID ya existe
+                List<Double> idsExistentes = DatabaseManager.cargarPersonas().stream()
+                        .map(Persona::getId)
+                        .collect(java.util.stream.Collectors.toList());
+
+                if (idsExistentes.contains(nuevoId)) {
+                    System.out.println("ERROR: El ID ingresado ya existe en la base de datos.");
+                    return; // Salir sin hacer nada
+                }
+
+                // Crear la Persona
+                Persona nuevaPersona = new Persona(nuevoId, nombres.getText(), apellidos.getText(), email.getText());
+
+                // Crear el Estudiante (hereda de Persona, por lo tanto, usa el mismo ID)
                 Estudiante nuevo = new Estudiante(nuevoId, nombres.getText(), apellidos.getText(), email.getText(), Double.parseDouble(codigo.getText()), true, 0.0);
+
+                // Guardar el Estudiante en la base de datos (esto también inserta en PERSONA)
                 guardarNuevoEstudianteEnDB(nuevo);
+
+                // Agregar a la lista local
                 this.listaDeEstudiantes.add(nuevo);
+
+                // ✅ Agregar también como Persona para que aparezca en la tabla de personas
+                servicioPersonas.inscribir(nuevaPersona);
+
                 cargarTodosLosDatos();
             }
+        } catch (NumberFormatException e) {
+            System.out.println("ERROR: El ID debe ser un número válido.");
         } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void guardarNuevoEstudianteEnDB(Estudiante estudiante) {
+        String sqlPersona = "INSERT INTO PERSONA(id, nombres, apellidos, email) VALUES(?, ?, ?, ?)";
+        String sqlEstudiante = "INSERT INTO ESTUDIANTE(id, codigo, programa_id, activo, promedio) VALUES(?, ?, ?, ?, ?)";
+        try (Connection conn = DatabaseManager.getConnection()) {
+            conn.setAutoCommit(false);
+            try (PreparedStatement pstmtPersona = conn.prepareStatement(sqlPersona); PreparedStatement pstmtEstudiante = conn.prepareStatement(sqlEstudiante)) {
+                pstmtPersona.setDouble(1, estudiante.getId());
+                pstmtPersona.setString(2, estudiante.getNombres());
+                pstmtPersona.setString(3, estudiante.getApellidos());
+                pstmtPersona.setString(4, estudiante.getEmail());
+                pstmtPersona.executeUpdate();
+                pstmtEstudiante.setDouble(1, estudiante.getId());
+                pstmtEstudiante.setDouble(2, estudiante.getCodigo());
+                pstmtEstudiante.setDouble(3, 111); // ID del programa por defecto
+                pstmtEstudiante.setBoolean(4, true);
+                pstmtEstudiante.setDouble(5, 0.0);
+                pstmtEstudiante.executeUpdate();
+                conn.commit();
+            } catch (SQLException e) {
+                conn.rollback();
+                e.printStackTrace();
+            }
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
     @FXML
     private void handleEliminarEstudiante() {
-        // Nota: Esta lógica solo elimina de la lista en memoria.
-        // Una implementación completa requeriría eliminar de la DB.
+
         Estudiante sel = estudiantesTable.getSelectionModel().getSelectedItem();
         if (sel != null) {
             this.listaDeEstudiantes.remove(sel);
+
+            servicioPersonas.eliminar(sel.getId());
+
             cargarTodosLosDatos();
         }
     }
@@ -641,6 +666,11 @@ public class MainWindowController {
                 TextField contratoField = (TextField) dialogPane.lookup("#contratoField");
                 Profesor nuevoProfesor = new Profesor(System.currentTimeMillis() / 1000.0, nombresField.getText(), apellidosField.getText(), emailField.getText(), contratoField.getText());
                 this.listaDeProfesores.add(nuevoProfesor);
+
+                // ✅ Agregar también como Persona para que aparezca en la tabla de personas
+                Persona nuevaPersona = new Persona(nuevoProfesor.getId(), nombresField.getText(), apellidosField.getText(), emailField.getText());
+                servicioPersonas.inscribir(nuevaPersona);
+
                 cargarTodosLosDatos();
             }
         } catch (IOException e) {
@@ -653,6 +683,10 @@ public class MainWindowController {
         Profesor seleccionado = profesoresTable.getSelectionModel().getSelectedItem();
         if (seleccionado != null) {
             this.listaDeProfesores.remove(seleccionado);
+
+            // ✅ Eliminar también de la lista de personas
+            servicioPersonas.eliminar(seleccionado.getId());
+
             cargarTodosLosDatos();
         }
     }
@@ -699,33 +733,6 @@ public class MainWindowController {
     }
 
     // --- Métodos de Ayuda ---
-    private void guardarNuevoEstudianteEnDB(Estudiante estudiante) {
-        String sqlPersona = "INSERT INTO PERSONA(id, nombres, apellidos, email) VALUES(?, ?, ?, ?)";
-        String sqlEstudiante = "INSERT INTO ESTUDIANTE(id, codigo, programa_id, activo, promedio) VALUES(?, ?, ?, ?, ?)";
-        try (Connection conn = DatabaseManager.getConnection()) {
-            conn.setAutoCommit(false);
-            try (PreparedStatement pstmtPersona = conn.prepareStatement(sqlPersona); PreparedStatement pstmtEstudiante = conn.prepareStatement(sqlEstudiante)) {
-                pstmtPersona.setDouble(1, estudiante.getId());
-                pstmtPersona.setString(2, estudiante.getNombres());
-                pstmtPersona.setString(3, estudiante.getApellidos());
-                pstmtPersona.setString(4, estudiante.getEmail());
-                pstmtPersona.executeUpdate();
-                pstmtEstudiante.setDouble(1, estudiante.getId());
-                pstmtEstudiante.setDouble(2, estudiante.getCodigo());
-                pstmtEstudiante.setDouble(3, 111); // ID del programa por defecto
-                pstmtEstudiante.setBoolean(4, true);
-                pstmtEstudiante.setDouble(5, 0.0);
-                pstmtEstudiante.executeUpdate();
-                conn.commit();
-            } catch (SQLException e) {
-                conn.rollback();
-                e.printStackTrace();
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
     private List<Estudiante> crearEstudiantesDePrueba() {
         List<Estudiante> estudiantes = new ArrayList<>();
         estudiantes.add(new Estudiante(101, "Maria", "Lopez", "maria@email.com", 202401, true, 4.5));
@@ -747,60 +754,6 @@ public class MainWindowController {
         cursos.add(new Curso(903, "Cálculo Integral", true));
         return cursos;
     }
-
-
-    private void guardarNuevoCursoEnDB(Curso curso) {
-        String sqlCurso = "MERGE INTO CURSO (id, nombre, programa_id, activo) KEY(id) VALUES (?, ?, ?, ?)";
-        try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sqlCurso)) {
-
-            pstmt.setInt(1, curso.getId());
-            pstmt.setString(2, curso.getNombre());
-            pstmt.setDouble(3, curso.getPrograma() != null ? curso.getPrograma().getId() : 0);
-            pstmt.setBoolean(4, curso.isActivo());
-
-            pstmt.executeUpdate();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void guardarNuevoProgramaEnDB(Programa programa) {
-        String sqlPrograma = "MERGE INTO PROGRAMA (id, nombre, duracion, registro, facultad_id) KEY(id) VALUES (?, ?, ?, ?, ?)";
-        try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sqlPrograma)) {
-
-            pstmt.setDouble(1, programa.getId());
-            pstmt.setString(2, programa.getNombre());
-            pstmt.setDouble(3, programa.getDuracion());
-            pstmt.setDate(4, new java.sql.Date(programa.getRegistro().getTime()));
-            pstmt.setDouble(5, programa.getFacultad() != null ? programa.getFacultad().getId() : 0);
-
-            pstmt.executeUpdate();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void guardarNuevaFacultadEnDB(Facultad facultad) {
-        String sqlFacultad = "MERGE INTO FACULTAD (id, nombre, decano_id) KEY(id) VALUES (?, ?, ?)";
-        try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sqlFacultad)) {
-
-            pstmt.setDouble(1, facultad.getId());
-            pstmt.setString(2, facultad.getNombre());
-            pstmt.setDouble(3, facultad.getDecano() != null ? facultad.getDecano().getId() : 0);
-
-            pstmt.executeUpdate();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-
 
     //  Getter para que la consola pueda acceder al mismo servicio
     public InscripcionesPersonas getServicioPersonas() {

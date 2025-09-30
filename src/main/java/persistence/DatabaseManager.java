@@ -135,4 +135,15 @@ public class DatabaseManager {
         }
         return personas;
     }
+
+    public static void eliminarPersona(double id) {
+        String sql = "DELETE FROM PERSONA WHERE id = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setDouble(1, id);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }

@@ -1,13 +1,14 @@
 package services;
 
 import model.CursoProfesor;
+import persistence.CursoProfesorDAOInterface;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 // Esta clase ahora gestiona la RELACIÓN entre Cursos y Profesores
 public class CursosProfesores implements Servicios {
-
     private final List<CursoProfesor> asignaciones;
 
     public CursosProfesores() {
@@ -22,7 +23,7 @@ public class CursosProfesores implements Servicios {
     public void asignarCurso(CursoProfesor nuevaAsignacion) {
         this.asignaciones.add(nuevaAsignacion);
     }
-    
+
     public void eliminarAsignacion(CursoProfesor asignacion) {
         this.asignaciones.remove(asignacion);
     }
@@ -44,7 +45,7 @@ public class CursosProfesores implements Servicios {
     @Override
     public List<String> imprimirLista() {
         return asignaciones.stream()
-                         .map(CursoProfesor::toString)
-                         .collect(Collectors.toList());
+                .map(CursoProfesor::toString)
+                .collect(Collectors.toList());
     }
 }

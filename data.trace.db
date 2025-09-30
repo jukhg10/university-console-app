@@ -1,0 +1,42 @@
+2025-09-30 09:24:56.947869-05:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "INSCRIPCION" not found (this database is empty); SQL statement:
+SELECT * FROM Inscripcion [42104-232]
+2025-09-30 09:25:18.538094-05:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "ESTUDIANTE" not found (this database is empty); SQL statement:
+SELECT * FROM ESTUDIANTE [42104-232]
+2025-09-30 09:25:40.411016-05:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "ESTUDIANTE" not found (this database is empty); SQL statement:
+SELECT * FROM ESTUDIANTE [42104-232]
+2025-09-30 09:25:40.928755-05:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "ESTUDIANTE" not found (this database is empty); SQL statement:
+SELECT * FROM ESTUDIANTE [42104-232]
+2025-09-30 09:25:41.096520-05:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "ESTUDIANTE" not found (this database is empty); SQL statement:
+SELECT * FROM ESTUDIANTE [42104-232]
+2025-09-30 09:25:41.247209-05:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "ESTUDIANTE" not found (this database is empty); SQL statement:
+SELECT * FROM ESTUDIANTE [42104-232]
+2025-09-30 09:25:41.446894-05:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "ESTUDIANTE" not found (this database is empty); SQL statement:
+SELECT * FROM ESTUDIANTE [42104-232]
+2025-09-30 09:25:44.455986-05:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "ESTUDIANTE" not found (this database is empty); SQL statement:
+SELECT * FROM ESTUDIANTE [42104-232]
+2025-09-30 09:26:19.498090-05:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "INSCRIPCION" not found (this database is empty); SQL statement:
+SELECT * FROM INSCRIPCION [42104-232]
+2025-09-30 09:26:20.279936-05:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "INSCRIPCION" not found (this database is empty); SQL statement:
+SELECT * FROM INSCRIPCION [42104-232]
+2025-09-30 09:26:20.656689-05:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "INSCRIPCION" not found (this database is empty); SQL statement:
+SELECT * FROM INSCRIPCION [42104-232]
+2025-09-30 09:26:20.815516-05:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "INSCRIPCION" not found (this database is empty); SQL statement:
+SELECT * FROM INSCRIPCION [42104-232]
+2025-09-30 09:26:20.966263-05:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "INSCRIPCION" not found (this database is empty); SQL statement:
+SELECT * FROM INSCRIPCION [42104-232]
+2025-09-30 09:26:21.135032-05:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "INSCRIPCION" not found (this database is empty); SQL statement:
+SELECT * FROM INSCRIPCION [42104-232]
