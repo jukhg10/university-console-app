@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.MainWindowController">
+   <center>
+      <TabPane tabClosingPolicy="UNAVAILABLE">
+         <tabs>
+            <Tab text="Inscripciones">
+               <content>
+                  <BorderPane>
+                     <left>
+                        <VBox prefWidth="180.0" spacing="10.0" style="-fx-background-color: #f0f0f0; -fx-border-color: #cccccc; -fx-border-width: 0 1 0 0;">
+                           <padding><Insets bottom="10.0" left="10.0" right="10.0" top="20.0" /></padding>
+                           <children>
+                              <Label text="Opciones"><font><Font name="System Bold" size="18.0" /></font></Label>
+                              <Button fx:id="inscribirBtn" maxWidth="1.7976931348623157E308" onAction="#handleInscribir" text="Inscribir Estudiante" />
+                              <Button fx:id="eliminarInscripcionBtn" disable="true" maxWidth="1.7976931348623157E308" onAction="#handleEliminarInscripcion" text="Eliminar Inscripción" />
+                           </children>
+                        </VBox>
+                     </left>
+                     <center>
+                        <VBox spacing="10.0" style="-fx-padding: 20;">
+                           <children>
+                              <Label text="Inscripciones Actuales"><font><Font name="System Bold" size="24.0" /></font></Label>
+                              <TableView fx:id="inscripcionesTable" prefHeight="2000.0">
+                                 <columns>
+                                    <TableColumn fx:id="idCol" prefWidth="50.0" text="ID" />
+                                    <TableColumn fx:id="estudianteCol" prefWidth="200.0" text="Estudiante" />
+                                    <TableColumn fx:id="cursoCol" prefWidth="200.0" text="Curso" />
+                                    <TableColumn fx:id="anoCol" prefWidth="75.0" text="Año" />
+                                    <TableColumn fx:id="semestreCol" prefWidth="75.0" text="Semestre" />
+                                 </columns>
+                              </TableView>
+                           </children>
+                        </VBox>
+                     </center>
+                  </BorderPane>
+               </content>
+            </Tab>
+
+            <Tab text="Estudiantes">
+               <content>
+                  <BorderPane>
+                     <left>
+                        <VBox prefWidth="180.0" spacing="10.0" style="-fx-background-color: #f0f0f0; -fx-border-color: #cccccc; -fx-border-width: 0 1 0 0;">
+                           <padding><Insets bottom="10.0" left="10.0" right="10.0" top="20.0" /></padding>
+                           <children>
+                              <Label text="Opciones"><font><Font name="System Bold" size="18.0" /></font></Label>
+                              <Button fx:id="agregarEstudianteBtn" maxWidth="Infinity" onAction="#handleAgregarEstudiante" text="Añadir Estudiante" />
+                              <Button fx:id="eliminarEstudianteBtn" disable="true" maxWidth="Infinity" onAction="#handleEliminarEstudiante" text="Eliminar Estudiante" />
+                           </children>
+                        </VBox>
+                     </left>
+                     <center>
+                        <VBox spacing="10.0" style="-fx-padding: 20;">
+                           <children>
+                              <Label text="Gestión de Estudiantes"><font><Font name="System Bold" size="24.0" /></font></Label>
+                              <TableView fx:id="estudiantesTable" prefHeight="2000.0">
+                                 <columns>
+                                    <TableColumn fx:id="estIdCol" prefWidth="50.0" text="ID" />
+                                    <TableColumn fx:id="estCodigoCol" prefWidth="100.0" text="Código" />
+                                    <TableColumn fx:id="estNombresCol" prefWidth="150.0" text="Nombres" />
+                                    <TableColumn fx:id="estApellidosCol" prefWidth="150.0" text="Apellidos" />
+                                    <TableColumn fx:id="estEmailCol" prefWidth="200.0" text="Email" />
+                                 </columns>
+                              </TableView>
+                           </children>
+                        </VBox>
+                     </center>
+                  </BorderPane>
+               </content>
+            </Tab>
+            
+            <Tab text="Profesores">
+               <content>
+                  <BorderPane>
+                     <left>
+                        <VBox prefWidth="180.0" spacing="10.0" style="-fx-background-color: #f0f0f0; -fx-border-color: #cccccc; -fx-border-width: 0 1 0 0;">
+                           <padding><Insets bottom="10.0" left="10.0" right="10.0" top="20.0" /></padding>
+                           <children>
+                              <Label text="Opciones"><font><Font name="System Bold" size="18.0" /></font></Label>
+                              <Button fx:id="agregarProfesorBtn" maxWidth="1.7976931348623157E308" onAction="#handleAgregarProfesor" text="Añadir Profesor" />
+                              <Button fx:id="eliminarProfesorBtn" disable="true" maxWidth="1.7976931348623157E308" onAction="#handleEliminarProfesor" text="Eliminar Profesor" />
+                           </children>
+                        </VBox>
+                     </left>
+                     <center>
+                        <VBox spacing="10.0" style="-fx-padding: 20;">
+                           <children>
+                              <Label text="Gestión de Profesores"><font><Font name="System Bold" size="24.0" /></font></Label>
+                              <TableView fx:id="profesoresTable" prefHeight="2000.0">
+                                 <columns>
+                                    <TableColumn fx:id="profIdCol" prefWidth="50.0" text="ID" />
+                                    <TableColumn fx:id="profNombresCol" prefWidth="150.0" text="Nombres" />
+                                    <TableColumn fx:id="profApellidosCol" prefWidth="150.0" text="Apellidos" />
+                                    <TableColumn fx:id="profEmailCol" prefWidth="200.0" text="Email" />
+                                    <TableColumn fx:id="profContratoCol" prefWidth="120.0" text="Contrato" />
+                                 </columns>
+                              </TableView>
+                           </children>
+                        </VBox>
+                     </center>
+                  </BorderPane>
+               </content>
+            </Tab>
+            
+            <Tab text="Asignaciones">
+               <content>
+                  <BorderPane>
+                     <left>
+                        <VBox prefWidth="180.0" spacing="10.0" style="-fx-background-color: #f0f0f0; -fx-border-color: #cccccc; -fx-border-width: 0 1 0 0;">
+                           <padding><Insets bottom="10.0" left="10.0" right="10.0" top="20.0" /></padding>
+                           <children>
+                              <Label text="Opciones"><font><Font name="System Bold" size="18.0" /></font></Label>
+                              <Button fx:id="asignarCursoBtn" maxWidth="1.7976931348623157E308" onAction="#handleAsignarCurso" text="Asignar Curso" />
+                              <Button fx:id="eliminarAsignacionBtn" disable="true" maxWidth="1.7976931348623157E308" onAction="#handleEliminarAsignacion" text="Eliminar Asignación" />
+                           </children>
+                        </VBox>
+                     </left>
+                     <center>
+                        <VBox spacing="10.0" style="-fx-padding: 20;">
+                           <children>
+                              <Label text="Asignaciones de Cursos"><font><Font name="System Bold" size="24.0" /></font></Label>
+                              <TableView fx:id="asignacionesTable" prefHeight="2000.0">
+                                 <columns>
+                                    <TableColumn fx:id="asigProfesorCol" prefWidth="200.0" text="Profesor" />
+                                    <TableColumn fx:id="asigCursoCol" prefWidth="200.0" text="Curso" />
+                                    <TableColumn fx:id="asigAnoCol" prefWidth="75.0" text="Año" />
+                                    <TableColumn fx:id="asigSemestreCol" prefWidth="75.0" text="Semestre" />
+                                 </columns>
+                              </TableView>
+                           </children>
+                        </VBox>
+                     </center>
+                  </BorderPane>
+               </content>
+            </Tab>
+
+
+
+            <Tab text="Externos">
+               <content>
+                  <BorderPane>
+                     <left>
+                        <VBox prefWidth="180.0" spacing="10.0" style="-fx-background-color: #f0f0f0; -fx-border-color: #cccccc; -fx-border-width: 0 1 0 0;">
+                           <padding><Insets bottom="10.0" left="10.0" right="10.0" top="20.0" /></padding>
+                           <children>
+                              <Label text="Opciones"><font><Font name="System Bold" size="18.0" /></font></Label>
+                              <Button fx:id="agregarPersonaBtn"
+                                      maxWidth="1.7976931348623157E308"
+                                      onAction="#handleAgregarPersona"
+                                      text="Agregar Persona" />
+                              <Button fx:id="eliminarPersonaBtn"
+                                      maxWidth="1.7976931348623157E308"
+                                      onAction="#handleEliminarPersona"
+                                      text="Eliminar Persona"
+                                      disable="true" />
+                           </children>
+                        </VBox>
+                     </left>
+                     <center>
+                        <VBox spacing="10.0" style="-fx-padding: 20;">
+                           <children>
+                              <Label text="Gestión de Personas"><font><Font name="System Bold" size="24.0" /></font></Label>
+                              <TableView fx:id="personasTable" prefHeight="2000.0">
+                                 <columns>
+                                    <TableColumn fx:id="personaIdCol" prefWidth="80.0" text="ID" />
+                                    <TableColumn fx:id="personaNombresCol" prefWidth="150.0" text="Nombres" />
+                                    <TableColumn fx:id="personaApellidosCol" prefWidth="150.0" text="Apellidos" />
+                                    <TableColumn fx:id="personaEmailCol" prefWidth="200.0" text="Email" />
+                                 </columns>
+                              </TableView>
+                           </children>
+                        </VBox>
+                     </center>
+                  </BorderPane>
+               </content>
+            </Tab>
+
+            <Tab text="Facultades">
+               <content>
+                  <BorderPane>
+                     <left>
+                        <VBox prefWidth="180.0" spacing="10.0" style="-fx-background-color: #f0f0f0; -fx-border-color: #cccccc; -fx-border-width: 0 1 0 0;">
+                           <padding><Insets bottom="10.0" left="10.0" right="10.0" top="20.0" /></padding>
+                           <children>
+                              <Label text="Opciones"><font><Font name="System Bold" size="18.0" /></font></Label>
+                              <Button fx:id="agregarFacultadBtn"
+                                      maxWidth="1.7976931348623157E308"
+                                      onAction="#handleAgregarFacultad"
+                                      text="Agregar Facultad" />
+                           </children>
+                        </VBox>
+                     </left>
+                     <center>
+                        <VBox spacing="10.0" style="-fx-padding: 20;">
+                           <children>
+                              <Label text="Gestión de Facultades"><font><Font name="System Bold" size="24.0" /></font></Label>
+                              <TableView fx:id="facultadesTable" prefHeight="2000.0">
+                                 <columns>
+                                    <TableColumn fx:id="facultadIdCol" prefWidth="80.0" text="ID" />
+                                    <TableColumn fx:id="facultadNombreCol" prefWidth="200.0" text="Nombre" />
+                                    <TableColumn fx:id="facultadDecanoCol" prefWidth="200.0" text="Decano" />
+                                 </columns>
+                              </TableView>
+                           </children>
+                        </VBox>
+                     </center>
+                  </BorderPane>
+               </content>
+            </Tab>
+
+            <Tab text="Programas">
+               <content>
+                  <BorderPane>
+                     <left>
+                        <VBox prefWidth="180.0" spacing="10.0" style="-fx-background-color: #f0f0f0; -fx-border-color: #cccccc; -fx-border-width: 0 1 0 0;">
+                           <padding><Insets bottom="10.0" left="10.0" right="10.0" top="20.0" /></padding>
+                           <children>
+                              <Label text="Opciones"><font><Font name="System Bold" size="18.0" /></font></Label>
+                              <Button fx:id="agregarProgramaBtn"
+                                      maxWidth="1.7976931348623157E308"
+                                      onAction="#handleAgregarPrograma"
+                                      text="Agregar Programa" />
+                           </children>
+                        </VBox>
+                     </left>
+                     <center>
+                        <VBox spacing="10.0" style="-fx-padding: 20;">
+                           <children>
+                              <Label text="Gestión de Programas"><font><Font name="System Bold" size="24.0" /></font></Label>
+                              <TableView fx:id="programasTable" prefHeight="2000.0">
+                                 <columns>
+                                    <TableColumn fx:id="programaIdCol" prefWidth="80.0" text="ID" />
+                                    <TableColumn fx:id="programaNombreCol" prefWidth="200.0" text="Nombre" />
+                                    <TableColumn fx:id="programaDuracionCol" prefWidth="100.0" text="Duración" />
+                                    <TableColumn fx:id="programaFechaCol" prefWidth="120.0" text="Registro" />
+                                    <TableColumn fx:id="programaFacultadCol" prefWidth="200.0" text="Facultad" />
+                                 </columns>
+                              </TableView>
+                           </children>
+                        </VBox>
+                     </center>
+                  </BorderPane>
+               </content>
+            </Tab>
+
+            <Tab text="Cursos">
+               <content>
+                  <BorderPane>
+                     <left>
+                        <VBox prefWidth="180.0" spacing="10.0" style="-fx-background-color: #f0f0f0; -fx-border-color: #cccccc; -fx-border-width: 0 1 0 0;">
+                           <padding><Insets bottom="10.0" left="10.0" right="10.0" top="20.0" /></padding>
+                           <children>
+                              <Label text="Opciones"><font><Font name="System Bold" size="18.0" /></font></Label>
+                              <Button fx:id="agregarCursoBtn"
+                                      maxWidth="1.7976931348623157E308"
+                                      onAction="#handleAgregarCurso"
+                                      text="Agregar Curso" />
+                           </children>
+                        </VBox>
+                     </left>
+                     <center>
+                        <VBox spacing="10.0" style="-fx-padding: 20;">
+                           <children>
+                              <Label text="Gestión de Cursos"><font><Font name="System Bold" size="24.0" /></font></Label>
+                              <TableView fx:id="cursosTable" prefHeight="2000.0">
+                                 <columns>
+                                    <TableColumn fx:id="cursoIdCol" prefWidth="80.0" text="ID" />
+                                    <TableColumn fx:id="cursoNombreCol" prefWidth="200.0" text="Nombre" />
+                                    <TableColumn fx:id="cursoProgramaCol" prefWidth="200.0" text="Programa" />
+                                    <TableColumn fx:id="cursoActivoCol" prefWidth="100.0" text="Activo" />
+                                 </columns>
+                              </TableView>
+                           </children>
+                        </VBox>
+                     </center>
+                  </BorderPane>
+               </content>
+            </Tab>
+         </tabs>
+      </TabPane>
+   </center>
+</BorderPane>
