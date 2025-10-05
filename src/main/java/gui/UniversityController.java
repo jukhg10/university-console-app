@@ -6,7 +6,6 @@ import fabricas.FabricaServiciosInterna;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import model.*;
-import observer.CursoConsoleLogger;
 import observer.CursoObserver;
 import services.Servicios;
 
@@ -15,7 +14,7 @@ import java.util.stream.Collectors;
 
 public class UniversityController {
     private final Servicios servicios;
-    private final CursoObserver cursoLogger = new CursoConsoleLogger();
+   // private final CursoObserver cursoLogger = new CursoConsoleLogger();
 
     // Lists that back the TableViews in the UI
     private final ObservableList<PersonaDTO> personasData;
@@ -27,43 +26,30 @@ public class UniversityController {
     private final ObservableList<Facultad> listaDeFacultades;
     private final ObservableList<CursoProfesor> asignacionesData;
 
+
     public UniversityController() {
         this.servicios = FabricaServiciosInterna.getServicios();
-        asignacionesData = FXCollections.observableArrayList(servicios.getCursoProfesorDAO().cargarTodos());
+
+
+        // Registrar el broadcaster en el DAO
+     //   servicios.getCursoDAO().addObserver(CursoLogBroadcaster.getInstance());
+
+        // Registrar también el logger en consola si deseas mantenerlo
+      //  CursoLogBroadcaster.getInstance().addObserver(new CursoConsoleLogger());
         // --- FIX: Load ALL data from the database upon initialization ---
         personasData = FXCollections.observableArrayList(
                 servicios.getPersonaDAO().cargarTodas().stream()
                         .map(PersonaMapper::toDTO)
                         .collect(Collectors.toList())
         );
-        List<Curso> cursosDesdeBD = servicios.getCursoDAO().cargarTodos();
-        for (Curso curso : cursosDesdeBD) {
-            curso.addObserver(cursoLogger); // Registrar observador
-        }
-        listaDeCursos = FXCollections.observableArrayList(cursosDesdeBD);
+        // Cargar los cursos desde el DAO (el DAO ya está observado)
+        listaDeCursos = FXCollections.observableArrayList(servicios.getCursoDAO().cargarTodos());
         inscripcionesData = FXCollections.observableArrayList(servicios.getInscripcionDAO().cargarDatos());
         estudiantesData = FXCollections.observableArrayList(servicios.getEstudianteDAO().cargarTodos());
         profesoresData = FXCollections.observableArrayList(servicios.getProfesorDAO().cargarTodos());
         listaDeProgramas = FXCollections.observableArrayList(servicios.getProgramaDAO().cargarTodos());
         listaDeFacultades = FXCollections.observableArrayList(servicios.getFacultadDAO().cargarTodas());
-        // This remains in-memory for now as it doesn't have a dedicated DAO
-        //asignacionesData = FXCollections.observableArrayList();
-    }
-
-    public void asignarCurso(CursoProfesor asignacion) {
-        servicios.getCursoProfesorDAO().guardar(asignacion);
-        asignacionesData.add(asignacion); // Update the UI
-    }
-
-    public void eliminarAsignacion(CursoProfesor asignacion) {
-        if (asignacion == null) return;
-        servicios.getCursoProfesorDAO().eliminar(
-                asignacion.getProfesor().getId(),
-                asignacion.getCurso().getId(),
-                asignacion.getAno(),
-                asignacion.getSemestre()
-        );
-        asignacionesData.remove(asignacion); // Update the UI
+        asignacionesData = FXCollections.observableArrayList(servicios.getCursoProfesorDAO().cargarTodos());
     }
 
     // --- Getters for the ObservableLists ---
@@ -76,6 +62,10 @@ public class UniversityController {
     public ObservableList<Facultad> getListaDeFacultades() { return listaDeFacultades; }
     public ObservableList<CursoProfesor> getAsignacionesData() { return asignacionesData; }
 
+    // Dentro de UniversityController.java
+    public Servicios getServicios() {
+        return servicios;
+    }
     // --- FIX: Fully Implemented Data-Modification Methods ---
     public void agregarPersona(PersonaDTO personaDTO) {
         Persona persona = PersonaMapper.toEntity(personaDTO);
@@ -125,32 +115,57 @@ public class UniversityController {
         profesoresData.remove(profesor); // Update the UI
     }
 
-    public void agregarCurso(Curso curso) {
-        curso.addObserver(cursoLogger); // Registrar observador para nuevos cursos
-        servicios.getCursoDAO().guardar(curso);
-        listaDeCursos.add(curso); // Update the UI
+    public boolean agregarCurso(Curso curso) {
+        boolean exito = servicios.getCursoDAO().guardar(curso);
+        if (exito) {
+            listaDeCursos.add(curso); // Update the UI
+        } else {
+            // Aquí puedes mostrar un mensaje de error al usuario
+            System.err.println("No se pudo agregar el curso.");
+        }
+        return exito;
     }
-
+    public void eliminarCurso(Curso curso) {
+        if (curso == null) return;
+        servicios.getCursoDAO().eliminar(curso.getId());
+        listaDeCursos.remove(curso); // Update the UI
+    }
     public void agregarPrograma(Programa programa) {
         servicios.getProgramaDAO().guardar(programa);
         listaDeProgramas.add(programa); // Update the UI
+    }
+    public void eliminarPrograma(Programa programa) {
+        if (programa == null) return;
+        servicios.getProgramaDAO().eliminar(programa.getId());
+        listaDeProgramas.remove(programa); // Update the UI
     }
 
     public void agregarFacultad(Facultad facultad) {
         servicios.getFacultadDAO().guardar(facultad);
         listaDeFacultades.add(facultad); // Update the UI
     }
+    public void eliminarFacultad(Facultad facultad) {
+        if (facultad == null) return;
+        servicios.getFacultadDAO().eliminar(facultad.getId());
+        listaDeFacultades.remove(facultad); // Update the UI
+    }
 
-   /* public void asignarCurso(CursoProfesor asignacion) {
-        // This part needs a CursoProfesorDAO to be fully persistent.
-        asignacionesData.add(asignacion);
+
+    public void asignarCurso(CursoProfesor asignacion) {
+        servicios.getCursoProfesorDAO().guardar(asignacion);
+        asignacionesData.add(asignacion); // Update the UI
     }
 
     public void eliminarAsignacion(CursoProfesor asignacion) {
         if (asignacion == null) return;
-        // This part needs a CursoProfesorDAO to be fully persistent.
-        asignacionesData.remove(asignacion);
-    }*/
+        servicios.getCursoProfesorDAO().eliminar(
+                asignacion.getProfesor().getId(),
+                asignacion.getCurso().getId(),
+                asignacion.getAno(),
+                asignacion.getSemestre()
+        );
+        asignacionesData.remove(asignacion); // Update the UI
+    }
 
     public List<Persona> getPersonasYProfesores() {
         // This can be used to populate ComboBoxes, for example, for selecting a Dean.

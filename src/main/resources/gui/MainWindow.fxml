@@ -199,6 +199,7 @@
                                       maxWidth="1.7976931348623157E308"
                                       onAction="#handleAgregarFacultad"
                                       text="Agregar Facultad" />
+                              <Button fx:id="eliminarFacultadBtn" text="Eliminar Facultad" onAction="#handleEliminarFacultad" />
                            </children>
                         </VBox>
                      </left>
@@ -232,6 +233,8 @@
                                       maxWidth="1.7976931348623157E308"
                                       onAction="#handleAgregarPrograma"
                                       text="Agregar Programa" />
+
+                              <Button fx:id="eliminarProgramaBtn" text="Eliminar Programa" onAction="#handleEliminarPrograma" />
                            </children>
                         </VBox>
                      </left>
@@ -267,6 +270,8 @@
                                       maxWidth="1.7976931348623157E308"
                                       onAction="#handleAgregarCurso"
                                       text="Agregar Curso" />
+                              <Button fx:id="eliminarCursoBtn" text="Eliminar Curso" onAction="#handleEliminarCurso" />
+
                            </children>
                         </VBox>
                      </left>

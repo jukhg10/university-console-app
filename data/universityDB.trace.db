@@ -1,4 +1,4 @@
-2025-10-04 22:15:01.754248-05:00 jdbc[3]: exception
+2025-10-05 12:05:22.231036-05:00 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Tabla "PERSONA" ya existe
 Table "PERSONA" already exists; SQL statement:
 -- Drop tables if they exist to ensure a clean slate
@@ -8,25 +8,27 @@ Table "PERSONA" already exists; SQL statement:
 CREATE TABLE PERSONA (
     ID BIGINT PRIMARY KEY AUTO_INCREMENT,
     NOMBRES  [42101-224]
-2025-10-04 22:15:01.757250-05:00 jdbc[3]: exception
+2025-10-05 12:05:22.234036-05:00 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Tabla "FACULTAD" ya existe
 Table "FACULTAD" already exists; SQL statement:
 CREATE TABLE FACULTAD (
-    ID BIGINT PRIMARY KEY,
-    NOMBRE VARCHAR(255) NOT NULL
+    ID BIGINT AUTO_INCREMENT PRIMARY KEY, -- <-- Cambiado a AUTO_INCREMENT
+    NOMBRE VARCHAR(255) NOT NULL,
+    DECANO_ID BIGINT,
+    FOREIGN KEY (DECANO_ID) REFERENCES PERSONA(ID)
 ) [42101-224]
-2025-10-04 22:15:01.758566-05:00 jdbc[3]: exception
+2025-10-05 12:05:22.236035-05:00 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Tabla "PROGRAMA" ya existe
 Table "PROGRAMA" already exists; SQL statement:
 CREATE TABLE PROGRAMA (
-    ID BIGINT PRIMARY KEY,
+    ID BIGINT PRIMARY KEY AUTO_INCREMENT,
     NOMBRE VARCHAR(255) NOT NULL,
     DURACION DOUBLE,
     REGISTRO_CALIFICADO DATE,
     FACULTAD_ID BIGINT,
     FOREIGN KEY (FACULTAD_ID) REFERENCES FACULTAD(ID)
 ) [42101-224]
-2025-10-04 22:15:01.759072-05:00 jdbc[3]: exception
+2025-10-05 12:05:22.236035-05:00 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Tabla "ESTUDIANTE" ya existe
 Table "ESTUDIANTE" already exists; SQL statement:
 CREATE TABLE ESTUDIANTE (
@@ -36,7 +38,7 @@ CREATE TABLE ESTUDIANTE (
     EMAIL VARCHAR(255),
     CODIGO BIGINT
 ) [42101-224]
-2025-10-04 22:15:01.760080-05:00 jdbc[3]: exception
+2025-10-05 12:05:22.237036-05:00 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Tabla "PROFESOR" ya existe
 Table "PROFESOR" already exists; SQL statement:
 CREATE TABLE PROFESOR (
@@ -46,17 +48,17 @@ CREATE TABLE PROFESOR (
     EMAIL VARCHAR(255),
     TIPO_CONTRATO VARCHAR(255)
 ) [42101-224]
-2025-10-04 22:15:01.761082-05:00 jdbc[3]: exception
+2025-10-05 12:05:22.238036-05:00 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Tabla "CURSO" ya existe
 Table "CURSO" already exists; SQL statement:
 CREATE TABLE CURSO (
-    ID BIGINT PRIMARY KEY,
+    ID BIGINT PRIMARY KEY AUTO_INCREMENT,
     NOMBRE VARCHAR(255) NOT NULL,
     PROGRAMA_ID BIGINT,
     ACTIVO BOOLEAN,
     FOREIGN KEY (PROGRAMA_ID) REFERENCES PROGRAMA(ID)
 ) [42101-224]
-2025-10-04 22:15:01.761082-05:00 jdbc[3]: exception
+2025-10-05 12:05:22.238036-05:00 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Tabla "INSCRIPCION" ya existe
 Table "INSCRIPCION" already exists; SQL statement:
 CREATE TABLE INSCRIPCION (
@@ -68,7 +70,7 @@ CREATE TABLE INSCRIPCION (
     FOREIGN KEY (ESTUDIANTE_ID) REFERENCES ESTUDIANTE(ID),
     FOREIGN KEY (CURSO_ID) REFERENCES CURSO(ID)
 ) [42101-224]
-2025-10-04 22:15:01.762081-05:00 jdbc[3]: exception
+2025-10-05 12:05:22.239038-05:00 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Tabla "CURSOPROFESOR" ya existe
 Table "CURSOPROFESOR" already exists; SQL statement:
 CREATE TABLE CURSOPROFESOR (
@@ -80,7 +82,7 @@ CREATE TABLE CURSOPROFESOR (
      FOREIGN KEY (PROFESOR_ID) REFERENCES PROFESOR(ID),
     FOREIGN KEY (CURSO_ID) REFERENCES CURSO(ID)
 ) [42101-224]
-2025-10-04 22:19:05.995674-05:00 jdbc[3]: exception
+2025-10-05 12:21:44.347379-05:00 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Tabla "PERSONA" ya existe
 Table "PERSONA" already exists; SQL statement:
 -- Drop tables if they exist to ensure a clean slate
@@ -90,25 +92,27 @@ Table "PERSONA" already exists; SQL statement:
 CREATE TABLE PERSONA (
     ID BIGINT PRIMARY KEY AUTO_INCREMENT,
     NOMBRES  [42101-224]
-2025-10-04 22:19:06.000673-05:00 jdbc[3]: exception
+2025-10-05 12:21:44.351379-05:00 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Tabla "FACULTAD" ya existe
 Table "FACULTAD" already exists; SQL statement:
 CREATE TABLE FACULTAD (
-    ID BIGINT PRIMARY KEY,
-    NOMBRE VARCHAR(255) NOT NULL
+    ID BIGINT AUTO_INCREMENT PRIMARY KEY, -- <-- Cambiado a AUTO_INCREMENT
+    NOMBRE VARCHAR(255) NOT NULL,
+    DECANO_ID BIGINT,
+    FOREIGN KEY (DECANO_ID) REFERENCES PERSONA(ID)
 ) [42101-224]
-2025-10-04 22:19:06.000673-05:00 jdbc[3]: exception
+2025-10-05 12:21:44.351379-05:00 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Tabla "PROGRAMA" ya existe
 Table "PROGRAMA" already exists; SQL statement:
 CREATE TABLE PROGRAMA (
-    ID BIGINT PRIMARY KEY,
+    ID BIGINT PRIMARY KEY AUTO_INCREMENT,
     NOMBRE VARCHAR(255) NOT NULL,
     DURACION DOUBLE,
     REGISTRO_CALIFICADO DATE,
     FACULTAD_ID BIGINT,
     FOREIGN KEY (FACULTAD_ID) REFERENCES FACULTAD(ID)
 ) [42101-224]
-2025-10-04 22:19:06.001675-05:00 jdbc[3]: exception
+2025-10-05 12:21:44.352378-05:00 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Tabla "ESTUDIANTE" ya existe
 Table "ESTUDIANTE" already exists; SQL statement:
 CREATE TABLE ESTUDIANTE (
@@ -118,7 +122,7 @@ CREATE TABLE ESTUDIANTE (
     EMAIL VARCHAR(255),
     CODIGO BIGINT
 ) [42101-224]
-2025-10-04 22:19:06.001675-05:00 jdbc[3]: exception
+2025-10-05 12:21:44.352378-05:00 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Tabla "PROFESOR" ya existe
 Table "PROFESOR" already exists; SQL statement:
 CREATE TABLE PROFESOR (
@@ -128,17 +132,17 @@ CREATE TABLE PROFESOR (
     EMAIL VARCHAR(255),
     TIPO_CONTRATO VARCHAR(255)
 ) [42101-224]
-2025-10-04 22:19:06.002674-05:00 jdbc[3]: exception
+2025-10-05 12:21:44.353378-05:00 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Tabla "CURSO" ya existe
 Table "CURSO" already exists; SQL statement:
 CREATE TABLE CURSO (
-    ID BIGINT PRIMARY KEY,
+    ID BIGINT PRIMARY KEY AUTO_INCREMENT,
     NOMBRE VARCHAR(255) NOT NULL,
     PROGRAMA_ID BIGINT,
     ACTIVO BOOLEAN,
     FOREIGN KEY (PROGRAMA_ID) REFERENCES PROGRAMA(ID)
 ) [42101-224]
-2025-10-04 22:19:06.002674-05:00 jdbc[3]: exception
+2025-10-05 12:21:44.353378-05:00 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Tabla "INSCRIPCION" ya existe
 Table "INSCRIPCION" already exists; SQL statement:
 CREATE TABLE INSCRIPCION (
@@ -150,7 +154,91 @@ CREATE TABLE INSCRIPCION (
     FOREIGN KEY (ESTUDIANTE_ID) REFERENCES ESTUDIANTE(ID),
     FOREIGN KEY (CURSO_ID) REFERENCES CURSO(ID)
 ) [42101-224]
-2025-10-04 22:19:06.003674-05:00 jdbc[3]: exception
+2025-10-05 12:21:44.354378-05:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Tabla "CURSOPROFESOR" ya existe
+Table "CURSOPROFESOR" already exists; SQL statement:
+CREATE TABLE CURSOPROFESOR (
+    PROFESOR_ID BIGINT,
+    CURSO_ID INT,
+    ANO INT,
+    SEMESTRE INT,
+    PRIMARY KEY (PROFESOR_ID, CURSO_ID, ANO, SEMESTRE),
+     FOREIGN KEY (PROFESOR_ID) REFERENCES PROFESOR(ID),
+    FOREIGN KEY (CURSO_ID) REFERENCES CURSO(ID)
+) [42101-224]
+2025-10-05 12:22:48.328669-05:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Tabla "PERSONA" ya existe
+Table "PERSONA" already exists; SQL statement:
+-- Drop tables if they exist to ensure a clean slate
+
+
+-- Añadida la tabla PERSONA
+CREATE TABLE PERSONA (
+    ID BIGINT PRIMARY KEY AUTO_INCREMENT,
+    NOMBRES  [42101-224]
+2025-10-05 12:22:48.331668-05:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Tabla "FACULTAD" ya existe
+Table "FACULTAD" already exists; SQL statement:
+CREATE TABLE FACULTAD (
+    ID BIGINT AUTO_INCREMENT PRIMARY KEY, -- <-- Cambiado a AUTO_INCREMENT
+    NOMBRE VARCHAR(255) NOT NULL,
+    DECANO_ID BIGINT,
+    FOREIGN KEY (DECANO_ID) REFERENCES PERSONA(ID)
+) [42101-224]
+2025-10-05 12:22:48.332670-05:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Tabla "PROGRAMA" ya existe
+Table "PROGRAMA" already exists; SQL statement:
+CREATE TABLE PROGRAMA (
+    ID BIGINT PRIMARY KEY AUTO_INCREMENT,
+    NOMBRE VARCHAR(255) NOT NULL,
+    DURACION DOUBLE,
+    REGISTRO_CALIFICADO DATE,
+    FACULTAD_ID BIGINT,
+    FOREIGN KEY (FACULTAD_ID) REFERENCES FACULTAD(ID)
+) [42101-224]
+2025-10-05 12:22:48.332670-05:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Tabla "ESTUDIANTE" ya existe
+Table "ESTUDIANTE" already exists; SQL statement:
+CREATE TABLE ESTUDIANTE (
+    ID BIGINT PRIMARY KEY AUTO_INCREMENT,
+    NOMBRES VARCHAR(255) NOT NULL,
+    APELLIDOS VARCHAR(255) NOT NULL,
+    EMAIL VARCHAR(255),
+    CODIGO BIGINT
+) [42101-224]
+2025-10-05 12:22:48.333669-05:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Tabla "PROFESOR" ya existe
+Table "PROFESOR" already exists; SQL statement:
+CREATE TABLE PROFESOR (
+    ID BIGINT PRIMARY KEY AUTO_INCREMENT,
+    NOMBRES VARCHAR(255) NOT NULL,
+    APELLIDOS VARCHAR(255) NOT NULL,
+    EMAIL VARCHAR(255),
+    TIPO_CONTRATO VARCHAR(255)
+) [42101-224]
+2025-10-05 12:22:48.333669-05:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Tabla "CURSO" ya existe
+Table "CURSO" already exists; SQL statement:
+CREATE TABLE CURSO (
+    ID BIGINT PRIMARY KEY AUTO_INCREMENT,
+    NOMBRE VARCHAR(255) NOT NULL,
+    PROGRAMA_ID BIGINT,
+    ACTIVO BOOLEAN,
+    FOREIGN KEY (PROGRAMA_ID) REFERENCES PROGRAMA(ID)
+) [42101-224]
+2025-10-05 12:22:48.334671-05:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Tabla "INSCRIPCION" ya existe
+Table "INSCRIPCION" already exists; SQL statement:
+CREATE TABLE INSCRIPCION (
+    ID BIGINT PRIMARY KEY AUTO_INCREMENT,
+    ANO INT,
+    SEMESTRE INT,
+    ESTUDIANTE_ID BIGINT,
+    CURSO_ID BIGINT,
+    FOREIGN KEY (ESTUDIANTE_ID) REFERENCES ESTUDIANTE(ID),
+    FOREIGN KEY (CURSO_ID) REFERENCES CURSO(ID)
+) [42101-224]
+2025-10-05 12:22:48.335671-05:00 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Tabla "CURSOPROFESOR" ya existe
 Table "CURSOPROFESOR" already exists; SQL statement:
 CREATE TABLE CURSOPROFESOR (

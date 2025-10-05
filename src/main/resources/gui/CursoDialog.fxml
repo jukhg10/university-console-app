@@ -19,17 +19,16 @@
                 <Insets top="20" right="20" bottom="10" left="10" />
             </padding>
 
-            <Label text="ID:" GridPane.rowIndex="0" GridPane.columnIndex="0" />
-            <TextField fx:id="idField" promptText="Ej: 901, 902" GridPane.rowIndex="0" GridPane.columnIndex="1" />
 
-            <Label text="Nombre:" GridPane.rowIndex="1" GridPane.columnIndex="0" />
-            <TextField fx:id="nombreField" promptText="Nombre del curso" GridPane.rowIndex="1" GridPane.columnIndex="1" />
 
-            <Label text="Programa:" GridPane.rowIndex="2" GridPane.columnIndex="0" />
-            <ComboBox fx:id="programaComboBox" prefWidth="250.0" GridPane.rowIndex="2" GridPane.columnIndex="1" />
+            <Label text="Nombre:" GridPane.rowIndex="0" GridPane.columnIndex="0" />
+            <TextField fx:id="nombreField" promptText="Nombre del curso" GridPane.rowIndex="0" GridPane.columnIndex="1" />
 
-            <Label text="Activo:" GridPane.rowIndex="3" GridPane.columnIndex="0" />
-            <CheckBox fx:id="activoCheckBox" GridPane.rowIndex="3" GridPane.columnIndex="1" />
+            <Label text="Programa:" GridPane.rowIndex="1" GridPane.columnIndex="0" />
+            <ComboBox fx:id="programaComboBox" prefWidth="250.0" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+
+            <Label text="Activo:" GridPane.rowIndex="2" GridPane.columnIndex="0" />
+            <CheckBox fx:id="activoCheckBox" GridPane.rowIndex="2" GridPane.columnIndex="1" />
         </GridPane>
     </content>
     <buttonTypes>

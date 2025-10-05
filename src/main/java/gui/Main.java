@@ -1,3 +1,4 @@
+// gui/Main.java
 package gui;
 
 import javafx.application.Application;
@@ -12,15 +13,17 @@ public class Main {
         GuiApp.setUniversityController(universityController);
 
         // 3. Se crea y se inicia la aplicación de consola en un nuevo hilo.
-        //    Esto es crucial para no bloquear la interfaz gráfica.
         Thread consoleThread = new Thread(() -> {
             ConsoleApp consoleApp = new ConsoleApp(universityController);
             consoleApp.start();
         });
-        consoleThread.setDaemon(true); // El hilo de la consola terminará si la GUI se cierra.
+        consoleThread.setDaemon(true);
         consoleThread.start();
 
-        // 4. Se lanza la aplicación de JavaFX (GUI).
+        // 4. Lanzar la ventana de logs DESPUÉS de que JavaFX esté listo
         Application.launch(GuiApp.class, args);
+
+        // Este código se ejecuta DESPUÉS de que la GUI se cierre
+        System.out.println("La aplicación ha terminado.");
     }
 }

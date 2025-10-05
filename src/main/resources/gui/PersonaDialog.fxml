@@ -17,17 +17,16 @@
                 <Insets top="20" right="20" bottom="10" left="10" />
             </padding>
 
-            <Label text="ID:" GridPane.rowIndex="0" GridPane.columnIndex="0" />
-            <TextField fx:id="idField" promptText="Ej: 1, 2.5, 100" GridPane.rowIndex="0" GridPane.columnIndex="1" />
 
-            <Label text="Nombres:" GridPane.rowIndex="1" GridPane.columnIndex="0" />
-            <TextField fx:id="nombresField" promptText="Nombres completos" GridPane.rowIndex="1" GridPane.columnIndex="1" />
 
-            <Label text="Apellidos:" GridPane.rowIndex="2" GridPane.columnIndex="0" />
-            <TextField fx:id="apellidosField" promptText="Apellidos completos" GridPane.rowIndex="2" GridPane.columnIndex="1" />
+            <Label text="Nombres:" GridPane.rowIndex="0" GridPane.columnIndex="0" />
+            <TextField fx:id="nombresField" promptText="Nombres completos" GridPane.rowIndex="0" GridPane.columnIndex="1" />
 
-            <Label text="Email:" GridPane.rowIndex="3" GridPane.columnIndex="0" />
-            <TextField fx:id="emailField" promptText="email@dominio.com" GridPane.rowIndex="3" GridPane.columnIndex="1" />
+            <Label text="Apellidos:" GridPane.rowIndex="1" GridPane.columnIndex="0" />
+            <TextField fx:id="apellidosField" promptText="Apellidos completos" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+
+            <Label text="Email:" GridPane.rowIndex="2" GridPane.columnIndex="0" />
+            <TextField fx:id="emailField" promptText="email@dominio.com" GridPane.rowIndex="2" GridPane.columnIndex="1" />
         </GridPane>
     </content>
     <buttonTypes>

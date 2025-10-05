@@ -4,4 +4,5 @@ import model.Curso;
 
 public interface CursoObserver {
     void onCursoModificado(Curso curso);
+    void onCursoEliminado(Curso curso);
 }

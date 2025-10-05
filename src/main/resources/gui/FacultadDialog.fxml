@@ -18,14 +18,13 @@
                 <Insets top="20" right="20" bottom="10" left="10" />
             </padding>
 
-            <Label text="ID:" GridPane.rowIndex="0" GridPane.columnIndex="0" />
-            <TextField fx:id="idField" promptText="Ej: 1, 2.5, 100" GridPane.rowIndex="0" GridPane.columnIndex="1" />
 
-            <Label text="Nombre:" GridPane.rowIndex="1" GridPane.columnIndex="0" />
-            <TextField fx:id="nombreField" promptText="Nombre de la facultad" GridPane.rowIndex="1" GridPane.columnIndex="1" />
 
-            <Label text="Decano:" GridPane.rowIndex="2" GridPane.columnIndex="0" />
-            <ComboBox fx:id="decanoComboBox" prefWidth="250.0" GridPane.rowIndex="2" GridPane.columnIndex="1" />
+            <Label text="Nombre:" GridPane.rowIndex="0" GridPane.columnIndex="0" />
+            <TextField fx:id="nombreField" promptText="Nombre de la facultad" GridPane.rowIndex="0" GridPane.columnIndex="1" />
+
+            <Label text="Decano:" GridPane.rowIndex="1" GridPane.columnIndex="0" />
+            <ComboBox fx:id="decanoComboBox" prefWidth="250.0" GridPane.rowIndex="1" GridPane.columnIndex="1" />
         </GridPane>
     </content>
     <buttonTypes>

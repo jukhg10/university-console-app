@@ -18,6 +18,8 @@ public class MainWindowController {
     private UniversityController universityController;
 
     // --- FXML Injected Fields ---
+    @FXML private Button eliminarProgramaBtn;
+    @FXML private Button eliminarFacultadBtn;
     @FXML private Button eliminarPersonaBtn;
     @FXML private TableView<Inscripcion> inscripcionesTable;
     @FXML private TableColumn<Inscripcion, Integer> idCol;
@@ -66,7 +68,7 @@ public class MainWindowController {
     @FXML private TableColumn<Curso, String> cursoNombreCol;
     @FXML private TableColumn<Curso, String> cursoProgramaCol;
     @FXML private TableColumn<Curso, String> cursoActivoCol;
-
+    @FXML private Button eliminarCursoBtn;
 
     public void setUniversityController(UniversityController universityController) {
         this.universityController = universityController;
@@ -80,6 +82,7 @@ public class MainWindowController {
     }
 
     private void configurarTodasLasTablas() {
+        cursosTable.getSelectionModel().selectedItemProperty().addListener((obs, old, nuev) -> eliminarCursoBtn.setDisable(nuev == null));
         // Bind the table data sources to the lists in the UniversityController
         personasTable.setItems(universityController.getPersonasData());
         cursosTable.setItems(universityController.getListaDeCursos());
@@ -89,7 +92,8 @@ public class MainWindowController {
         profesoresTable.setItems(universityController.getProfesoresData());
         estudiantesTable.setItems(universityController.getEstudiantesData());
         asignacionesTable.setItems(universityController.getAsignacionesData());
-
+        facultadesTable.getSelectionModel().selectedItemProperty().addListener((obs, old, nuev) -> eliminarFacultadBtn.setDisable(nuev == null));
+        programasTable.getSelectionModel().selectedItemProperty().addListener((obs, old, nuev) -> eliminarProgramaBtn.setDisable(nuev == null));
         // Configure cell value factories for all tables
         // --- Cursos Table ---
         cursoIdCol.setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -173,7 +177,28 @@ public class MainWindowController {
             universityController.eliminarPersona(seleccionada);
         }
     }
+    @FXML
+    private void handleEliminarCurso() {
+        Curso seleccionado = cursosTable.getSelectionModel().getSelectedItem();
+        if (seleccionado != null) {
+            // Opcional: Preguntar al usuario si está seguro
+            Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
+            confirmacion.setTitle("Confirmar eliminación");
+            confirmacion.setHeaderText("¿Estás seguro de que deseas eliminar el curso?");
+            confirmacion.setContentText("Curso: " + seleccionado.getNombre() + " (ID: " + seleccionado.getId() + ")");
 
+            Optional<ButtonType> resultado = confirmacion.showAndWait();
+            if (resultado.isPresent() && resultado.get() == ButtonType.OK) {
+                universityController.eliminarCurso(seleccionado);
+            }
+        } else {
+            // Mostrar un mensaje si no hay selección
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Ningún curso seleccionado");
+            alert.setHeaderText("No se ha seleccionado ningún curso para eliminar.");
+            alert.showAndWait();
+        }
+    }
     @FXML
     private void handleAgregarCurso() {
         try {
@@ -181,7 +206,7 @@ public class MainWindowController {
             DialogPane dialogPane = loader.load();
 
             // Use direct field access instead of lookup
-            TextField idField = (TextField) dialogPane.lookup("#idField");
+            // TextField idField = (TextField) dialogPane.lookup("#idField"); <-- Ya no necesitamos el ID
             TextField nombreField = (TextField) dialogPane.lookup("#nombreField");
             ComboBox<Programa> programaComboBox = (ComboBox<Programa>) dialogPane.lookup("#programaComboBox");
             CheckBox activoCheckBox = (CheckBox) dialogPane.lookup("#activoCheckBox");
@@ -191,31 +216,48 @@ public class MainWindowController {
             Dialog<ButtonType> dialog = new Dialog<>();
             dialog.setDialogPane(dialogPane);
             dialog.setTitle("Agregar Curso");
-            
+
             Optional<ButtonType> result = dialog.showAndWait();
 
             if (result.isPresent() && result.get() == ButtonType.OK) {
-                int id = Integer.parseInt(idField.getText().trim());
+                // int id = Integer.parseInt(idField.getText().trim()); <-- Ya no leemos el ID
                 String nombre = nombreField.getText().trim();
                 Programa programa = programaComboBox.getValue();
                 boolean activo = activoCheckBox.isSelected();
 
-                Curso nuevo = new Curso(id, nombre, activo);
+                // Creamos el curso sin ID, lo generará la base de datos
+                Curso nuevo = new Curso(0, nombre, activo); // <-- ID temporal (0)
                 nuevo.setPrograma(programa);
-                universityController.agregarCurso(nuevo);
+
+                // Verificar si el curso se agregó correctamente
+                boolean exito = universityController.agregarCurso(nuevo);
+                if (!exito) {
+                    // Mostrar un mensaje de error al usuario
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error al agregar curso");
+                    alert.setHeaderText("No se pudo agregar el curso.");
+                    alert.setContentText("Ocurrió un error al intentar guardarlo.");
+                    alert.showAndWait();
+                }
             }
+        } catch (NumberFormatException e) {
+            // Manejar el caso donde el ID no es un número válido
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error de formato");
+            alert.setHeaderText("El ID ingresado no es válido.");
+            alert.setContentText("Por favor, ingresa un número entero para el ID.");
+            alert.showAndWait();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-
     @FXML
     private void handleAgregarPrograma() {
-         try {
+        try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/ProgramaDialog.fxml"));
             DialogPane dialogPane = loader.load();
 
-            TextField idField = (TextField) dialogPane.lookup("#idField");
+            // TextField idField = (TextField) dialogPane.lookup("#idField"); <-- Ya no necesitamos el ID
             TextField nombreField = (TextField) dialogPane.lookup("#nombreField");
             TextField duracionField = (TextField) dialogPane.lookup("#duracionField");
             DatePicker fechaPicker = (DatePicker) dialogPane.lookup("#fechaPicker");
@@ -226,18 +268,20 @@ public class MainWindowController {
             Dialog<ButtonType> dialog = new Dialog<>();
             dialog.setDialogPane(dialogPane);
             dialog.setTitle("Agregar Programa");
-            
+
             Optional<ButtonType> result = dialog.showAndWait();
 
             if (result.isPresent() && result.get() == ButtonType.OK) {
-                double id = Double.parseDouble(idField.getText().trim());
+                // double id = Double.parseDouble(idField.getText().trim()); <-- Ya no leemos el ID
                 String nombre = nombreField.getText().trim();
                 double duracion = Double.parseDouble(duracionField.getText().trim());
                 LocalDate localDate = fechaPicker.getValue();
                 java.util.Date registro = java.sql.Date.valueOf(localDate);
                 Facultad facultad = facultadComboBox.getValue();
 
-                Programa nuevo = new Programa(id, nombre, duracion, registro, facultad);
+                // Creamos el programa sin ID, lo generará la base de datos
+                Programa nuevo = new Programa(0, nombre, duracion, registro, facultad); // <-- ID temporal (0)
+
                 universityController.agregarPrograma(nuevo);
             }
         } catch (Exception e) {
@@ -246,18 +290,39 @@ public class MainWindowController {
     }
 
     @FXML
+    private void handleEliminarPrograma() {
+        Programa seleccionado = programasTable.getSelectionModel().getSelectedItem();
+        if (seleccionado != null) {
+            // Opcional: Preguntar al usuario si está seguro
+            Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
+            confirmacion.setTitle("Confirmar eliminación");
+            confirmacion.setHeaderText("¿Estás seguro de que deseas eliminar el programa?");
+            confirmacion.setContentText("Programa: " + seleccionado.getNombre() + " (ID: " + seleccionado.getId() + ")");
+
+            Optional<ButtonType> resultado = confirmacion.showAndWait();
+            if (resultado.isPresent() && resultado.get() == ButtonType.OK) {
+                universityController.eliminarPrograma(seleccionado);
+            }
+        } else {
+            // Mostrar un mensaje si no hay selección
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Ningún programa seleccionado");
+            alert.setHeaderText("No se ha seleccionado ningún programa para eliminar.");
+            alert.showAndWait();
+        }
+    }
+    @FXML
     private void handleAgregarFacultad() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/FacultadDialog.fxml"));
             DialogPane dialogPane = loader.load();
-
-            TextField idField = (TextField) dialogPane.lookup("#idField");
+            // TextField idField = (TextField) dialogPane.lookup("#idField"); <-- Ya no necesitamos el ID
             TextField nombreField = (TextField) dialogPane.lookup("#nombreField");
             ComboBox<Persona> decanoComboBox = (ComboBox<Persona>) dialogPane.lookup("#decanoComboBox");
 
             List<Persona> decanosDisponibles = universityController.getPersonasYProfesores();
             decanoComboBox.getItems().setAll(decanosDisponibles);
-            
+
             Dialog<ButtonType> dialog = new Dialog<>();
             dialog.setDialogPane(dialogPane);
             dialog.setTitle("Agregar Facultad");
@@ -265,16 +330,41 @@ public class MainWindowController {
             Optional<ButtonType> result = dialog.showAndWait();
 
             if (result.isPresent() && result.get() == ButtonType.OK) {
-                double id = Double.parseDouble(idField.getText().trim());
+                // double id = Double.parseDouble(idField.getText().trim()); <-- Ya no leemos el ID
                 String nombre = nombreField.getText().trim();
                 Persona decano = decanoComboBox.getValue();
 
-                Facultad nueva = new Facultad(id, nombre);
+                // Creamos la facultad sin ID, lo generará la base de datos
+                Facultad nueva = new Facultad(0, nombre); // <-- ID temporal (0)
                 nueva.setDecano(decano);
+
                 universityController.agregarFacultad(nueva);
             }
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void handleEliminarFacultad() {
+        Facultad seleccionada = facultadesTable.getSelectionModel().getSelectedItem();
+        if (seleccionada != null) {
+            // Opcional: Preguntar al usuario si está seguro
+            Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
+            confirmacion.setTitle("Confirmar eliminación");
+            confirmacion.setHeaderText("¿Estás seguro de que deseas eliminar la facultad?");
+            confirmacion.setContentText("Facultad: " + seleccionada.getNombre() + " (ID: " + seleccionada.getId() + ")");
+
+            Optional<ButtonType> resultado = confirmacion.showAndWait();
+            if (resultado.isPresent() && resultado.get() == ButtonType.OK) {
+                universityController.eliminarFacultad(seleccionada);
+            }
+        } else {
+            // Mostrar un mensaje si no hay selección
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Ninguna facultad seleccionada");
+            alert.setHeaderText("No se ha seleccionado ninguna facultad para eliminar.");
+            alert.showAndWait();
         }
     }
 
@@ -284,13 +374,13 @@ public class MainWindowController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/PersonaDialog.fxml"));
             DialogPane dialogPane = loader.load();
 
-            TextField idField = (TextField) dialogPane.lookup("#idField");
+           // TextField idField = (TextField) dialogPane.lookup("#idField");
             TextField nombresField = (TextField) dialogPane.lookup("#nombresField");
             TextField apellidosField = (TextField) dialogPane.lookup("#apellidosField");
             TextField emailField = (TextField) dialogPane.lookup("#emailField");
 
             // No generamos ID aquí, lo hará la base de datos
-            idField.setDisable(true); // <-- Deshabilitamos el campo
+          //  idField.setDisable(true); // <-- Deshabilitamos el campo
 
             Dialog<ButtonType> dialog = new Dialog<>();
             dialog.setDialogPane(dialogPane);

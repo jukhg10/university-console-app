@@ -19,20 +19,18 @@
                 <Insets top="20" right="20" bottom="10" left="10" />
             </padding>
 
-            <Label text="ID:" GridPane.rowIndex="0" GridPane.columnIndex="0" />
-            <TextField fx:id="idField" promptText="Ej: 1, 2.5, 100" GridPane.rowIndex="0" GridPane.columnIndex="1" />
 
-            <Label text="Nombre:" GridPane.rowIndex="1" GridPane.columnIndex="0" />
-            <TextField fx:id="nombreField" promptText="Nombre del programa" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+            <Label text="Nombre:" GridPane.rowIndex="0" GridPane.columnIndex="0" />
+            <TextField fx:id="nombreField" promptText="Nombre del programa" GridPane.rowIndex="0" GridPane.columnIndex="1" />
 
-            <Label text="Duración (semestres):" GridPane.rowIndex="2" GridPane.columnIndex="0" />
-            <TextField fx:id="duracionField" promptText="Ej: 8, 10" GridPane.rowIndex="2" GridPane.columnIndex="1" />
+            <Label text="Duración (semestres):" GridPane.rowIndex="1" GridPane.columnIndex="0" />
+            <TextField fx:id="duracionField" promptText="Ej: 8, 10" GridPane.rowIndex="1" GridPane.columnIndex="1" />
 
-            <Label text="Fecha Registro:" GridPane.rowIndex="3" GridPane.columnIndex="0" />
-            <DatePicker fx:id="fechaPicker" GridPane.rowIndex="3" GridPane.columnIndex="1" />
+            <Label text="Fecha Registro:" GridPane.rowIndex="2" GridPane.columnIndex="0" />
+            <DatePicker fx:id="fechaPicker" GridPane.rowIndex="2" GridPane.columnIndex="1" />
 
-            <Label text="Facultad:" GridPane.rowIndex="4" GridPane.columnIndex="0" />
-            <ComboBox fx:id="facultadComboBox" prefWidth="250.0" GridPane.rowIndex="4" GridPane.columnIndex="1" />
+            <Label text="Facultad:" GridPane.rowIndex="3" GridPane.columnIndex="0" />
+            <ComboBox fx:id="facultadComboBox" prefWidth="250.0" GridPane.rowIndex="3" GridPane.columnIndex="1" />
         </GridPane>
     </content>
     <buttonTypes>
