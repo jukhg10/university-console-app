@@ -37,7 +37,7 @@ public class EstudianteDAO {
             try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     estudiante.setId(generatedKeys.getDouble(1)); // <-- Asignamos el ID generado como int
-                    System.out.println("DAO: Inscripción guardada con ID: " + estudiante.getId());
+                    System.out.println("DAO: Estudiante guardado con ID: " + estudiante.getId());
                 } else {
                     throw new SQLException("No se pudo obtener el ID generado.");
                 }

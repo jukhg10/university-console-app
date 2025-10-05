@@ -47,7 +47,33 @@ public class FacultadDAO {
     }
 
     // Nuevo método para eliminar una facultad por ID
+    public boolean puedeEliminar(double id) {
+        // Verificar si tiene programas asociados
+        String sql = String.format("SELECT COUNT(*) FROM %s WHERE %s = ?",
+                connectionFactory.quote("PROGRAMA"),
+                connectionFactory.quote("FACULTAD_ID")
+        );
+        try (Connection conn = connectionFactory.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setDouble(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    int count = rs.getInt(1);
+                    return count == 0; // Puede eliminar si no tiene programas
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     public void eliminar(double id) {
+        if (!puedeEliminar(id)) {
+            System.out.println("No se puede eliminar la facultad con ID " + id + " porque tiene programas asociados.");
+            return;
+        }
+
         String sql = String.format("DELETE FROM %s WHERE %s = ?",
                 connectionFactory.quote("FACULTAD"),
                 connectionFactory.quote("ID")

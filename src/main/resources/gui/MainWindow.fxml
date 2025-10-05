@@ -12,9 +12,9 @@
 <?import javafx.scene.text.Font?>
 
 <BorderPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.MainWindowController">
-   <center>
-      <TabPane tabClosingPolicy="UNAVAILABLE">
-         <tabs>
+<center>
+   <TabPane fx:id="mainTabPane" tabClosingPolicy="UNAVAILABLE">
+   <tabs>
             <Tab text="Inscripciones">
                <content>
                   <BorderPane>
@@ -271,6 +271,7 @@
                                       onAction="#handleAgregarCurso"
                                       text="Agregar Curso" />
                               <Button fx:id="eliminarCursoBtn" text="Eliminar Curso" onAction="#handleEliminarCurso" />
+                              <Button fx:id="modificarCursoBtn" text="Modificar Curso" onAction="#handleModificarCurso" />
 
                            </children>
                         </VBox>

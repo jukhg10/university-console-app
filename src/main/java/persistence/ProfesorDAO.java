@@ -1,11 +1,8 @@
+// persistence/ProfesorDAO.java
 package persistence;
 
 import model.Profesor;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,11 +15,8 @@ public class ProfesorDAO {
     }
 
     public void guardar(Profesor profesor) {
-        // --- CORRECCIÓN AQUÍ ---
-        // Asegurarse de que los nombres de tabla y columna coincidan con el schema
         String sql = String.format("INSERT INTO %s (%s, %s, %s, %s) VALUES (?, ?, ?, ?)",
                 connectionFactory.quote("PROFESOR"),
-             //   connectionFactory.quote("ID"),
                 connectionFactory.quote("NOMBRES"),
                 connectionFactory.quote("APELLIDOS"),
                 connectionFactory.quote("EMAIL"),
@@ -39,8 +33,8 @@ public class ProfesorDAO {
 
             try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
-                    profesor.setId(generatedKeys.getDouble(1)); // <-- Asignamos el ID generado como int
-                    System.out.println("DAO: Inscripción guardada con ID: " + profesor.getId());
+                    profesor.setId(generatedKeys.getDouble(1));
+                    System.out.println("DAO: Profesor guardado con ID: " + profesor.getId());
                 } else {
                     throw new SQLException("No se pudo obtener el ID generado.");
                 }
@@ -50,10 +44,55 @@ public class ProfesorDAO {
         }
     }
 
+    // Nuevo método para verificar si un profesor puede eliminarse (si no tiene cursos asignados)
+    public boolean puedeEliminar(double id) {
+        // Verificar si tiene cursos asignados
+        String sql = String.format("SELECT COUNT(*) FROM %s WHERE %s = ?",
+                connectionFactory.quote("CURSOPROFESOR"), // <-- Tabla de asignaciones
+                connectionFactory.quote("PROFESOR_ID") // <-- Columna que referencia al profesor
+        );
+        try (Connection conn = connectionFactory.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setDouble(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    int count = rs.getInt(1);
+                    return count == 0; // Puede eliminar si no tiene cursos asignados
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    // Método eliminar actualizado para verificar dependencias antes de eliminar
+    public void eliminar(double id) {
+        if (!puedeEliminar(id)) {
+            System.out.println("No se puede eliminar el profesor con ID " + id + " porque tiene cursos asignados.");
+            return; // <-- No eliminar si tiene dependencias
+        }
+
+        String sql = String.format("DELETE FROM %s WHERE %s = ?",
+                connectionFactory.quote("PROFESOR"),
+                connectionFactory.quote("ID")
+        );
+        try (Connection conn = connectionFactory.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setDouble(1, id);
+            int filasAfectadas = stmt.executeUpdate();
+            if (filasAfectadas > 0) {
+                System.out.println("DAO: Profesor con ID " + id + " eliminado exitosamente.");
+            } else {
+                System.out.println("DAO: No se encontró un profesor con ID " + id + ".");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     public List<Profesor> cargarTodos() {
         List<Profesor> profesores = new ArrayList<>();
-        // --- LA CORRECCIÓN PRINCIPAL ESTÁ AQUÍ ---
-        // Se cambió "CONTRATO" por "TIPO_CONTRATO"
         String sql = String.format("SELECT %s, %s, %s, %s, %s FROM %s",
                 connectionFactory.quote("ID"),
                 connectionFactory.quote("NOMBRES"),
@@ -74,30 +113,14 @@ public class ProfesorDAO {
         }
         return profesores;
     }
-    
-    public void eliminar(double id) {
-        String sql = String.format("DELETE FROM %s WHERE %s = ?",
-                connectionFactory.quote("PROFESOR"),
-                connectionFactory.quote("ID")
-        );
-        try (Connection conn = connectionFactory.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setDouble(1, id);
-            stmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
 
     private Profesor construirProfesor(ResultSet rs) throws SQLException {
-        // --- CORRECCIÓN AQUÍ ---
-        // También se actualiza el nombre de la columna al leer el resultado
         return new Profesor(
-            rs.getDouble("ID"),
-            rs.getString("NOMBRES"),
-            rs.getString("APELLIDOS"),
-            rs.getString("EMAIL"),
-            rs.getString("TIPO_CONTRATO")
+                rs.getDouble("ID"),
+                rs.getString("NOMBRES"),
+                rs.getString("APELLIDOS"),
+                rs.getString("EMAIL"),
+                rs.getString("TIPO_CONTRATO")
         );
     }
 }

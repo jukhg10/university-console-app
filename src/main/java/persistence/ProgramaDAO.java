@@ -47,8 +47,35 @@ public class ProgramaDAO {
         }
     }
 
-    // Nuevo método para eliminar un programa por ID
+    // Nuevo método para verificar si un programa puede eliminarse (si no tiene cursos asociados)
+    public boolean puedeEliminar(double id) {
+        // Verificar si tiene cursos asociados
+        String sql = String.format("SELECT COUNT(*) FROM %s WHERE %s = ?",
+                connectionFactory.quote("CURSO"), // <-- Tabla de cursos
+                connectionFactory.quote("PROGRAMA_ID") // <-- Columna que referencia al programa
+        );
+        try (Connection conn = connectionFactory.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setDouble(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    int count = rs.getInt(1);
+                    return count == 0; // Puede eliminar si no tiene cursos
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    // Método eliminar actualizado para verificar dependencias antes de eliminar
     public void eliminar(double id) {
+        if (!puedeEliminar(id)) {
+            System.out.println("No se puede eliminar el programa con ID " + id + " porque tiene cursos asociados.");
+            return; // <-- No eliminar si tiene dependencias
+        }
+
         String sql = String.format("DELETE FROM %s WHERE %s = ?",
                 connectionFactory.quote("PROGRAMA"),
                 connectionFactory.quote("ID")

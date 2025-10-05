@@ -3,6 +3,7 @@ package gui;
 import dto.PersonaDTO;
 import dto.PersonaMapper;
 import fabricas.FabricaServiciosInterna;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import model.*;
@@ -77,20 +78,27 @@ public class UniversityController {
         personasData.add(actualizado); // <-- Agregamos el DTO actualizado a la UI
     }
 
-    public void eliminarPersona(PersonaDTO personaDTO) {
+    public boolean eliminarPersona(PersonaDTO personaDTO) {
+        if (personaDTO == null) return false;
+        if (!servicios.getPersonaDAO().puedeEliminar(personaDTO.getId())) {
+            System.out.println("No se puede eliminar la persona porque tiene dependencias es decano.");
+            return false; // <-- Indicar que no fue exitoso
+        }
         servicios.getPersonaDAO().eliminar(personaDTO.getId());
         personasData.remove(personaDTO); // Update the UI
+        return true; // <-- Indicar que fue exitoso
     }
-
     public void inscribirEstudiante(Inscripcion inscripcion) {
         servicios.getInscripcionDAO().guardar(inscripcion);
         inscripcionesData.add(inscripcion); // Update the UI
     }
 
-    public void eliminarInscripcion(Inscripcion inscripcion) {
-        if (inscripcion == null) return;
+    public boolean eliminarInscripcion(Inscripcion inscripcion) {
+        if (inscripcion == null) return false;
         servicios.getInscripcionDAO().eliminar(inscripcion.getId());
         inscripcionesData.remove(inscripcion); // Update the UI
+        System.out.println("UI: Inscripción eliminada exitosamente.");
+        return true; // <-- Indicar que fue exitoso
     }
 
     public void agregarEstudiante(Estudiante estudiante) {
@@ -98,21 +106,34 @@ public class UniversityController {
         estudiantesData.add(estudiante); // Update the UI
     }
 
-    public void eliminarEstudiante(Estudiante estudiante) {
-        if (estudiante == null) return;
-        servicios.getEstudianteDAO().eliminar(estudiante.getId());
-        estudiantesData.remove(estudiante); // Update the UI
+    public boolean eliminarEstudiante(Estudiante estudiante) {
+        if (estudiante == null) return false;
+        try {
+            servicios.getEstudianteDAO().eliminar(estudiante.getId());
+            estudiantesData.remove(estudiante); // Update the UI
+            System.out.println("Estudiante eliminado exitosamente.");
+            return true; // <-- Indicar que fue exitoso
+        } catch (Exception e) {
+            System.err.println("Error al eliminar estudiante: " + e.getMessage());
+            return false; // <-- Indicar que no fue exitoso
+        }
     }
+
 
     public void agregarProfesor(Profesor profesor) {
         servicios.getProfesorDAO().guardar(profesor); // <-- El DAO ahora asigna el ID generado
         profesoresData.add(profesor);
     }
 
-    public void eliminarProfesor(Profesor profesor) {
-        if (profesor == null) return;
+    public boolean eliminarProfesor(Profesor profesor) {
+        if (profesor == null) return false;
+        if (!servicios.getProfesorDAO().puedeEliminar(profesor.getId())) {
+            System.out.println("No se puede eliminar el profesor porque tiene cursos asignados.");
+            return false; // <-- Indicar que no fue exitoso
+        }
         servicios.getProfesorDAO().eliminar(profesor.getId());
         profesoresData.remove(profesor); // Update the UI
+        return true; // <-- Indicar que fue exitoso
     }
 
     public boolean agregarCurso(Curso curso) {
@@ -125,29 +146,65 @@ public class UniversityController {
         }
         return exito;
     }
-    public void eliminarCurso(Curso curso) {
-        if (curso == null) return;
+    public boolean eliminarCurso(Curso curso) {
+        if (curso == null) return false;
+        if (!servicios.getCursoDAO().puedeEliminar(curso.getId())) {
+            System.out.println("No se puede eliminar el curso porque tiene inscripciones asociadas.");
+            return false; // <-- Indicar que no fue exitoso
+        }
         servicios.getCursoDAO().eliminar(curso.getId());
         listaDeCursos.remove(curso); // Update the UI
+        return true; // <-- Indicar que fue exitoso
+    }
+
+    public boolean modificarCurso(Curso curso) {
+        if (curso == null) return false;
+        try {
+            // El DAO se encarga de actualizar en la base de datos
+            servicios.getCursoDAO().actualizar(curso); // <-- Asumiendo que crearás este método en CursoDAO
+
+            // No toques la interfaz aquí
+            System.out.println("UI: Curso modificado exitosamente.");
+            return true;
+        } catch (Exception e) {
+            System.err.println("Error al modificar curso: " + e.getMessage());
+            return false;
+        }
+    }
+    public void recargarInscripciones() {
+        inscripcionesData.setAll(servicios.getInscripcionDAO().cargarDatos());
+    }
+    public void recargarAsignaciones() {
+        asignacionesData.setAll(servicios.getCursoProfesorDAO().cargarTodos()); // Asegúrate de que este método exista en CursoProfesorDAO
     }
     public void agregarPrograma(Programa programa) {
         servicios.getProgramaDAO().guardar(programa);
         listaDeProgramas.add(programa); // Update the UI
     }
-    public void eliminarPrograma(Programa programa) {
-        if (programa == null) return;
+    public boolean eliminarPrograma(Programa programa) {
+        if (programa == null) return false;
+        if (!servicios.getProgramaDAO().puedeEliminar(programa.getId())) {
+            System.out.println("No se puede eliminar el programa porque tiene cursos asociados.");
+            return false; // <-- Indicar que no fue exitoso
+        }
         servicios.getProgramaDAO().eliminar(programa.getId());
         listaDeProgramas.remove(programa); // Update the UI
+        return true; // <-- Indicar que fue exitoso
     }
 
     public void agregarFacultad(Facultad facultad) {
         servicios.getFacultadDAO().guardar(facultad);
         listaDeFacultades.add(facultad); // Update the UI
     }
-    public void eliminarFacultad(Facultad facultad) {
-        if (facultad == null) return;
+    public boolean eliminarFacultad(Facultad facultad) {
+        if (facultad == null) return false;
+        if (!servicios.getFacultadDAO().puedeEliminar(facultad.getId())) {
+            System.out.println("No se puede eliminar la facultad porque tiene programas asociados.");
+            return false;
+        }
         servicios.getFacultadDAO().eliminar(facultad.getId());
         listaDeFacultades.remove(facultad); // Update the UI
+        return true;
     }
 
 
@@ -156,15 +213,22 @@ public class UniversityController {
         asignacionesData.add(asignacion); // Update the UI
     }
 
-    public void eliminarAsignacion(CursoProfesor asignacion) {
-        if (asignacion == null) return;
-        servicios.getCursoProfesorDAO().eliminar(
-                asignacion.getProfesor().getId(),
-                asignacion.getCurso().getId(),
-                asignacion.getAno(),
-                asignacion.getSemestre()
-        );
-        asignacionesData.remove(asignacion); // Update the UI
+    public boolean eliminarAsignacion(CursoProfesor asignacion) {
+        if (asignacion == null) return false;
+        try {
+            servicios.getCursoProfesorDAO().eliminar(
+                    asignacion.getProfesor().getId(),
+                    asignacion.getCurso().getId(),
+                    asignacion.getAno(),
+                    asignacion.getSemestre()
+            );
+            asignacionesData.remove(asignacion); // Update the UI
+            System.out.println("UI: Asignación eliminada exitosamente.");
+            return true; // <-- Indicar que fue exitoso
+        } catch (Exception e) {
+            System.err.println("Error al eliminar asignación: " + e.getMessage());
+            return false; // <-- Indicar que no fue exitoso
+        }
     }
 
     public List<Persona> getPersonasYProfesores() {

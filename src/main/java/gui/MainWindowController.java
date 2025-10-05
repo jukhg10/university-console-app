@@ -1,6 +1,7 @@
 package gui;
 import dto.PersonaDTO;
 
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -18,10 +19,12 @@ public class MainWindowController {
     private UniversityController universityController;
 
     // --- FXML Injected Fields ---
+    @FXML private Button modificarCursoBtn;
     @FXML private Button eliminarProgramaBtn;
     @FXML private Button eliminarFacultadBtn;
     @FXML private Button eliminarPersonaBtn;
     @FXML private TableView<Inscripcion> inscripcionesTable;
+    @FXML private TabPane mainTabPane;
     @FXML private TableColumn<Inscripcion, Integer> idCol;
     @FXML private TableColumn<Inscripcion, String> estudianteCol;
     @FXML private TableColumn<Inscripcion, String> cursoCol;
@@ -77,6 +80,15 @@ public class MainWindowController {
 
     @FXML
     public void initialize() {
+        mainTabPane.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> {
+            if ("Inscripciones".equals(newTab.getText())) {
+                universityController.recargarInscripciones();
+                Platform.runLater(() -> inscripcionesTable.refresh()); // Forzar actualización visual
+            } else if ("Asignaciones".equals(newTab.getText())) { // <-- Nueva condición
+                universityController.recargarAsignaciones();       // <-- Recarga asignaciones
+                Platform.runLater(() -> asignacionesTable.refresh()); // Forzar actualización visual
+            }
+        });
         // Initialization logic is now handled in setUniversityController
         // to ensure the controller is available.
     }
@@ -94,6 +106,7 @@ public class MainWindowController {
         asignacionesTable.setItems(universityController.getAsignacionesData());
         facultadesTable.getSelectionModel().selectedItemProperty().addListener((obs, old, nuev) -> eliminarFacultadBtn.setDisable(nuev == null));
         programasTable.getSelectionModel().selectedItemProperty().addListener((obs, old, nuev) -> eliminarProgramaBtn.setDisable(nuev == null));
+        cursosTable.getSelectionModel().selectedItemProperty().addListener((obs, old, nuev) -> modificarCursoBtn.setDisable(nuev == null));
         // Configure cell value factories for all tables
         // --- Cursos Table ---
         cursoIdCol.setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -174,14 +187,33 @@ public class MainWindowController {
     private void handleEliminarPersona() {
         PersonaDTO seleccionada = personasTable.getSelectionModel().getSelectedItem();
         if (seleccionada != null) {
-            universityController.eliminarPersona(seleccionada);
+            Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
+            confirmacion.setTitle("Confirmar eliminación");
+            confirmacion.setHeaderText("¿Estás seguro de que deseas eliminar la persona?");
+            confirmacion.setContentText("Persona: " + seleccionada.getNombres() + " " + seleccionada.getApellidos() + " (ID: " + seleccionada.getId() + ")");
+
+            Optional<ButtonType> resultado = confirmacion.showAndWait();
+            if (resultado.isPresent() && resultado.get() == ButtonType.OK) {
+                boolean exito = universityController.eliminarPersona(seleccionada);
+                if (!exito) {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error al eliminar");
+                    alert.setHeaderText("No se pudo eliminar la persona.");
+                    alert.setContentText("La persona tiene dependencias es decano. Elimine las dependencias primero.");
+                    alert.showAndWait();
+                }
+            }
+        } else {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Ninguna persona seleccionada");
+            alert.setHeaderText("No se ha seleccionado ninguna persona para eliminar.");
+            alert.showAndWait();
         }
     }
     @FXML
     private void handleEliminarCurso() {
         Curso seleccionado = cursosTable.getSelectionModel().getSelectedItem();
         if (seleccionado != null) {
-            // Opcional: Preguntar al usuario si está seguro
             Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
             confirmacion.setTitle("Confirmar eliminación");
             confirmacion.setHeaderText("¿Estás seguro de que deseas eliminar el curso?");
@@ -189,16 +221,24 @@ public class MainWindowController {
 
             Optional<ButtonType> resultado = confirmacion.showAndWait();
             if (resultado.isPresent() && resultado.get() == ButtonType.OK) {
-                universityController.eliminarCurso(seleccionado);
+                boolean exito = universityController.eliminarCurso(seleccionado);
+                if (!exito) {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error al eliminar");
+                    alert.setHeaderText("No se pudo eliminar el curso.");
+                    alert.setContentText("El curso tiene inscripciones asociadas. Elimine las inscripciones primero.");
+                    alert.showAndWait();
+                }
             }
         } else {
-            // Mostrar un mensaje si no hay selección
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("Ningún curso seleccionado");
             alert.setHeaderText("No se ha seleccionado ningún curso para eliminar.");
             alert.showAndWait();
         }
     }
+
+
     @FXML
     private void handleAgregarCurso() {
         try {
@@ -251,6 +291,70 @@ public class MainWindowController {
             e.printStackTrace();
         }
     }
+    // gui/MainWindowController.java
+    @FXML
+    private void handleModificarCurso() {
+        Curso seleccionado = cursosTable.getSelectionModel().getSelectedItem();
+        if (seleccionado != null) {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/CursoDialog.fxml"));
+                DialogPane dialogPane = loader.load();
+
+                // Accedemos a los campos del diálogo
+                TextField nombreField = (TextField) dialogPane.lookup("#nombreField");
+                ComboBox<Programa> programaComboBox = (ComboBox<Programa>) dialogPane.lookup("#programaComboBox");
+                CheckBox activoCheckBox = (CheckBox) dialogPane.lookup("#activoCheckBox");
+
+                // Cargamos los datos del curso seleccionado en los campos
+                nombreField.setText(seleccionado.getNombre());
+                programaComboBox.getItems().setAll(universityController.getListaDeProgramas());
+                programaComboBox.setValue(seleccionado.getPrograma());
+                activoCheckBox.setSelected(seleccionado.isActivo());
+
+                Dialog<ButtonType> dialog = new Dialog<>();
+                dialog.setDialogPane(dialogPane);
+                dialog.setTitle("Modificar Curso");
+
+                Optional<ButtonType> result = dialog.showAndWait();
+
+                if (result.isPresent() && result.get() == ButtonType.OK) {
+                    // Actualizamos los datos del curso con los nuevos valores
+                    seleccionado.setNombre(nombreField.getText().trim());
+                    seleccionado.setPrograma(programaComboBox.getValue());
+                    seleccionado.setActivo(activoCheckBox.isSelected());
+
+                    // Llamamos al método de actualización en UniversityController
+                    boolean exito = universityController.modificarCurso(seleccionado);
+                    if (exito) {
+                        // Forzar actualización visual de la tabla de cursos
+                        cursosTable.refresh();
+
+                        // Forzar actualización visual de tablas relacionadas
+                        inscripcionesTable.refresh();    // <-- Actualiza la tabla de inscripciones
+                        asignacionesTable.refresh();     // <-- Actualiza la tabla de asignaciones
+
+                        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                        alert.setTitle("Modificación exitosa");
+                        alert.setHeaderText("El curso ha sido modificado.");
+                        alert.showAndWait();
+                    } else {
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setTitle("Error al modificar");
+                        alert.setHeaderText("No se pudo modificar el curso.");
+                        alert.setContentText("Ocurrió un error al intentar guardar los cambios.");
+                        alert.showAndWait();
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Ningún curso seleccionado");
+            alert.setHeaderText("No se ha seleccionado ningún curso para modificar.");
+            alert.showAndWait();
+        }
+    }
     @FXML
     private void handleAgregarPrograma() {
         try {
@@ -293,7 +397,6 @@ public class MainWindowController {
     private void handleEliminarPrograma() {
         Programa seleccionado = programasTable.getSelectionModel().getSelectedItem();
         if (seleccionado != null) {
-            // Opcional: Preguntar al usuario si está seguro
             Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
             confirmacion.setTitle("Confirmar eliminación");
             confirmacion.setHeaderText("¿Estás seguro de que deseas eliminar el programa?");
@@ -301,10 +404,16 @@ public class MainWindowController {
 
             Optional<ButtonType> resultado = confirmacion.showAndWait();
             if (resultado.isPresent() && resultado.get() == ButtonType.OK) {
-                universityController.eliminarPrograma(seleccionado);
+                boolean exito = universityController.eliminarPrograma(seleccionado);
+                if (!exito) {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error al eliminar");
+                    alert.setHeaderText("No se pudo eliminar el programa.");
+                    alert.setContentText("El programa tiene cursos asociados. Elimine los cursos primero.");
+                    alert.showAndWait();
+                }
             }
         } else {
-            // Mostrar un mensaje si no hay selección
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("Ningún programa seleccionado");
             alert.setHeaderText("No se ha seleccionado ningún programa para eliminar.");
@@ -349,7 +458,6 @@ public class MainWindowController {
     private void handleEliminarFacultad() {
         Facultad seleccionada = facultadesTable.getSelectionModel().getSelectedItem();
         if (seleccionada != null) {
-            // Opcional: Preguntar al usuario si está seguro
             Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
             confirmacion.setTitle("Confirmar eliminación");
             confirmacion.setHeaderText("¿Estás seguro de que deseas eliminar la facultad?");
@@ -357,10 +465,16 @@ public class MainWindowController {
 
             Optional<ButtonType> resultado = confirmacion.showAndWait();
             if (resultado.isPresent() && resultado.get() == ButtonType.OK) {
-                universityController.eliminarFacultad(seleccionada);
+                boolean exito = universityController.eliminarFacultad(seleccionada);
+                if (!exito) {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error al eliminar");
+                    alert.setHeaderText("No se pudo eliminar la facultad.");
+                    alert.setContentText("La facultad tiene programas asociados. Elimine los programas primero.");
+                    alert.showAndWait();
+                }
             }
         } else {
-            // Mostrar un mensaje si no hay selección
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("Ninguna facultad seleccionada");
             alert.setHeaderText("No se ha seleccionado ninguna facultad para eliminar.");
@@ -443,8 +557,30 @@ public class MainWindowController {
 
     @FXML
     private void handleEliminarInscripcion() {
-        Inscripcion sel = inscripcionesTable.getSelectionModel().getSelectedItem();
-        universityController.eliminarInscripcion(sel);
+        Inscripcion seleccionada = inscripcionesTable.getSelectionModel().getSelectedItem();
+        if (seleccionada != null) {
+            Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
+            confirmacion.setTitle("Confirmar eliminación");
+            confirmacion.setHeaderText("¿Estás seguro de que deseas eliminar la inscripción?");
+            confirmacion.setContentText("Estudiante: " + seleccionada.getEstudiante().getNombres() + " " + seleccionada.getEstudiante().getApellidos() +
+                    "\nCurso: " + seleccionada.getCurso().getNombre() + " (ID: " + seleccionada.getCurso().getId() + ")");
+
+            Optional<ButtonType> resultado = confirmacion.showAndWait();
+            if (resultado.isPresent() && resultado.get() == ButtonType.OK) {
+                boolean exito = universityController.eliminarInscripcion(seleccionada);
+                if (exito) {
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Eliminación exitosa");
+                    alert.setHeaderText("La inscripción ha sido eliminada.");
+                    alert.showAndWait();
+                }
+            }
+        } else {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Ninguna inscripción seleccionada");
+            alert.setHeaderText("No se ha seleccionado ninguna inscripción para eliminar.");
+            alert.showAndWait();
+        }
     }
     
     @FXML
@@ -471,11 +607,38 @@ public class MainWindowController {
             e.printStackTrace();
         }
     }
-    
+
     @FXML
     private void handleEliminarEstudiante() {
-        Estudiante sel = estudiantesTable.getSelectionModel().getSelectedItem();
-        universityController.eliminarEstudiante(sel);
+        Estudiante seleccionado = estudiantesTable.getSelectionModel().getSelectedItem();
+        if (seleccionado != null) {
+            Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
+            confirmacion.setTitle("Confirmar eliminación");
+            confirmacion.setHeaderText("¿Estás seguro de que deseas eliminar al estudiante?");
+            confirmacion.setContentText("Estudiante: " + seleccionado.getNombres() + " " + seleccionado.getApellidos() + " (ID: " + seleccionado.getId() + ")");
+
+            Optional<ButtonType> resultado = confirmacion.showAndWait();
+            if (resultado.isPresent() && resultado.get() == ButtonType.OK) {
+                boolean exito = universityController.eliminarEstudiante(seleccionado);
+                if (exito) {
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Eliminación exitosa");
+                    alert.setHeaderText("El estudiante ha sido eliminado.");
+                    alert.showAndWait();
+                } else {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error al eliminar");
+                    alert.setHeaderText("No se pudo eliminar al estudiante.");
+                    alert.setContentText("Ocurrió un error al intentar eliminar al estudiante.");
+                    alert.showAndWait();
+                }
+            }
+        } else {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Ningún estudiante seleccionado");
+            alert.setHeaderText("No se ha seleccionado ningún estudiante para eliminar.");
+            alert.showAndWait();
+        }
     }
 
     @FXML
@@ -514,7 +677,29 @@ public class MainWindowController {
     @FXML
     private void handleEliminarProfesor() {
         Profesor seleccionado = profesoresTable.getSelectionModel().getSelectedItem();
-        universityController.eliminarProfesor(seleccionado);
+        if (seleccionado != null) {
+            Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
+            confirmacion.setTitle("Confirmar eliminación");
+            confirmacion.setHeaderText("¿Estás seguro de que deseas eliminar el profesor?");
+            confirmacion.setContentText("Profesor: " + seleccionado.getNombres() + " " + seleccionado.getApellidos() + " (ID: " + seleccionado.getId() + ")");
+
+            Optional<ButtonType> resultado = confirmacion.showAndWait();
+            if (resultado.isPresent() && resultado.get() == ButtonType.OK) {
+                boolean exito = universityController.eliminarProfesor(seleccionado);
+                if (!exito) {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error al eliminar");
+                    alert.setHeaderText("No se pudo eliminar el profesor.");
+                    alert.setContentText("El profesor tiene cursos asignados. Elimine las asignaciones primero.");
+                    alert.showAndWait();
+                }
+            }
+        } else {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Ningún profesor seleccionado");
+            alert.setHeaderText("No se ha seleccionado ningún profesor para eliminar.");
+            alert.showAndWait();
+        }
     }
 
     @FXML
@@ -554,6 +739,35 @@ public class MainWindowController {
     @FXML
     private void handleEliminarAsignacion() {
         CursoProfesor seleccion = asignacionesTable.getSelectionModel().getSelectedItem();
-        universityController.eliminarAsignacion(seleccion); // <-- Ahora llama al DAO
+        if (seleccion != null) {
+            Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
+            confirmacion.setTitle("Confirmar eliminación");
+            confirmacion.setHeaderText("¿Estás seguro de que deseas eliminar la asignación?");
+            confirmacion.setContentText("Profesor: " + seleccion.getProfesor().getNombres() + " " + seleccion.getProfesor().getApellidos() +
+                    "\nCurso: " + seleccion.getCurso().getNombre() +
+                    "\nAño: " + seleccion.getAno() + ", Semestre: " + seleccion.getSemestre());
+
+            Optional<ButtonType> resultado = confirmacion.showAndWait();
+            if (resultado.isPresent() && resultado.get() == ButtonType.OK) {
+                boolean exito = universityController.eliminarAsignacion(seleccion);
+                if (exito) {
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Eliminación exitosa");
+                    alert.setHeaderText("La asignación ha sido eliminada.");
+                    alert.showAndWait();
+                } else {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error al eliminar");
+                    alert.setHeaderText("No se pudo eliminar la asignación.");
+                    alert.setContentText("Ocurrió un error al intentar eliminar la asignación.");
+                    alert.showAndWait();
+                }
+            }
+        } else {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Ninguna asignación seleccionada");
+            alert.setHeaderText("No se ha seleccionado ninguna asignación para eliminar.");
+            alert.showAndWait();
+        }
     }
 }
