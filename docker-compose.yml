@@ -1,0 +1,30 @@
+services:
+  # --- Servicio para MySQL ---
+  db-mysql:
+    image: mysql:8.0
+    container_name: mysql_db
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_DATABASE: universitydb
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: rootpassword
+    ports:
+      # Exponemos MySQL en el puerto 3307
+      - "3307:3306"
+    volumes:
+      - ./mysql-data:/var/lib/mysql
+
+  # --- Servicio para Oracle ---
+  db-oracle:
+    image: gvenzl/oracle-xe:latest
+    container_name: oracle_db
+    restart: always
+    environment:
+      ORACLE_PASSWORD: your_strong_password
+    ports:
+      # Exponemos Oracle en el puerto 1521
+      - "1521:1521"
+    volumes:
+      - ./oracle-data:/opt/oracle/oradata
