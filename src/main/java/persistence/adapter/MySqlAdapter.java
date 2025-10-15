@@ -24,6 +24,7 @@ public class MySqlAdapter implements DatabaseAdapter {
 
     @Override
     public String quote(String identifier) {
-        return "`" + identifier + "`";
+        // Convierte a minúsculas para evitar problemas de case-sensitivity en Linux
+        return "`" + identifier.toLowerCase() + "`";
     }
 }

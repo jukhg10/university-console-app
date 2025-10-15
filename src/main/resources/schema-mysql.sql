@@ -1,147 +1,137 @@
--- Drop tables if they exist to ensure a clean slate
-
 -- Create Tables
-CREATE TABLE IF NOT EXISTS PERSONA (
-    ID BIGINT PRIMARY KEY AUTO_INCREMENT,
-    NOMBRES VARCHAR(255) NOT NULL,
-    APELLIDOS VARCHAR(255) NOT NULL,
-    EMAIL VARCHAR(255)
+CREATE TABLE IF NOT EXISTS persona (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    nombres VARCHAR(255) NOT NULL,
+    apellidos VARCHAR(255) NOT NULL,
+    email VARCHAR(255)
 );
 
-CREATE TABLE IF NOT EXISTS FACULTAD (
-    ID BIGINT PRIMARY KEY AUTO_INCREMENT,
-    NOMBRE VARCHAR(255) NOT NULL,
-    DECANO_ID BIGINT,
-    FOREIGN KEY (DECANO_ID) REFERENCES PERSONA(ID)
+CREATE TABLE IF NOT EXISTS facultad (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(255) NOT NULL,
+    decano_id BIGINT,
+    FOREIGN KEY (decano_id) REFERENCES persona(id)
 );
 
-CREATE TABLE IF NOT EXISTS PROGRAMA (
-    ID BIGINT PRIMARY KEY AUTO_INCREMENT,
-    NOMBRE VARCHAR(255) NOT NULL,
-    DURACION DOUBLE,
-    REGISTRO_CALIFICADO DATE,
-    FACULTAD_ID BIGINT,
-    FOREIGN KEY (FACULTAD_ID) REFERENCES FACULTAD(ID)
+CREATE TABLE IF NOT EXISTS programa (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(255) NOT NULL,
+    duracion DOUBLE,
+    registro_calificado DATE,
+    facultad_id BIGINT,
+    FOREIGN KEY (facultad_id) REFERENCES facultad(id)
 );
 
-CREATE TABLE IF NOT EXISTS ESTUDIANTE (
-    ID BIGINT PRIMARY KEY AUTO_INCREMENT,
-    NOMBRES VARCHAR(255) NOT NULL,
-    APELLIDOS VARCHAR(255) NOT NULL,
-    EMAIL VARCHAR(255),
-    CODIGO BIGINT
+CREATE TABLE IF NOT EXISTS estudiante (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    nombres VARCHAR(255) NOT NULL,
+    apellidos VARCHAR(255) NOT NULL,
+    email VARCHAR(255),
+    codigo BIGINT
 );
 
-CREATE TABLE IF NOT EXISTS PROFESOR (
-    ID BIGINT PRIMARY KEY AUTO_INCREMENT,
-    NOMBRES VARCHAR(255) NOT NULL,
-    APELLIDOS VARCHAR(255) NOT NULL,
-    EMAIL VARCHAR(255),
-    TIPO_CONTRATO VARCHAR(255)
+CREATE TABLE IF NOT EXISTS profesor (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    nombres VARCHAR(255) NOT NULL,
+    apellidos VARCHAR(255) NOT NULL,
+    email VARCHAR(255),
+    tipo_contrato VARCHAR(255)
 );
 
-CREATE TABLE IF NOT EXISTS CURSO (
-    ID BIGINT PRIMARY KEY AUTO_INCREMENT,
-    NOMBRE VARCHAR(255) NOT NULL,
-    PROGRAMA_ID BIGINT,
-    ACTIVO BOOLEAN,
-    FOREIGN KEY (PROGRAMA_ID) REFERENCES PROGRAMA(ID)
+CREATE TABLE IF NOT EXISTS curso (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(255) NOT NULL,
+    programa_id BIGINT,
+    activo BOOLEAN,
+    FOREIGN KEY (programa_id) REFERENCES programa(id)
 );
 
-CREATE TABLE IF NOT EXISTS INSCRIPCION (
-    ID BIGINT PRIMARY KEY AUTO_INCREMENT,
-    ANO INT,
-    SEMESTRE INT,
-    ESTUDIANTE_ID BIGINT,
-    CURSO_ID BIGINT,
-    FOREIGN KEY (ESTUDIANTE_ID) REFERENCES ESTUDIANTE(ID),
-    FOREIGN KEY (CURSO_ID) REFERENCES CURSO(ID)
+CREATE TABLE IF NOT EXISTS inscripcion (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    ano INT,
+    semestre INT,
+    estudiante_id BIGINT,
+    curso_id BIGINT,
+    FOREIGN KEY (estudiante_id) REFERENCES estudiante(id),
+    FOREIGN KEY (curso_id) REFERENCES curso(id)
 );
 
-CREATE TABLE IF NOT EXISTS CURSOPROFESOR (
-    PROFESOR_ID BIGINT,
-    CURSO_ID BIGINT,
-    ANO INT,
-    SEMESTRE INT,
-    PRIMARY KEY (PROFESOR_ID, CURSO_ID, ANO, SEMESTRE),
-    FOREIGN KEY (PROFESOR_ID) REFERENCES PROFESOR(ID),
-    FOREIGN KEY (CURSO_ID) REFERENCES CURSO(ID)
+CREATE TABLE IF NOT EXISTS cursoprofesor (
+    profesor_id BIGINT,
+    curso_id BIGINT,
+    ano INT,
+    semestre INT,
+    PRIMARY KEY (profesor_id, curso_id, ano, semestre),
+    FOREIGN KEY (profesor_id) REFERENCES profesor(id),
+    FOREIGN KEY (curso_id) REFERENCES curso(id)
 );
 
 -- --- DATOS DE EJEMPLO ---
 
--- Personas (para decanos o personas externas)
-INSERT INTO PERSONA (ID, NOMBRES, APELLIDOS, EMAIL) VALUES
+INSERT INTO persona (id, nombres, apellidos, email) VALUES
 (1, 'Ricardo', 'Perez', 'ricardo.perez@university.com'),
 (2, 'Ana', 'Lopez', 'ana.lopez@university.com'),
 (3, 'Luis', 'Martinez', 'luis.martinez@external.com')
 ON DUPLICATE KEY UPDATE
-    NOMBRES = VALUES(NOMBRES),
-    APELLIDOS = VALUES(APELLIDOS),
-    EMAIL = VALUES(EMAIL);
+    nombres = VALUES(nombres),
+    apellidos = VALUES(apellidos),
+    email = VALUES(email);
 
--- Facultades (una con decano, una sin decano)
-INSERT INTO FACULTAD (ID, NOMBRE, DECANO_ID) VALUES
+INSERT INTO facultad (id, nombre, decano_id) VALUES
 (1, 'Ingeniería', 1),
 (2, 'Ciencias Sociales', NULL)
 ON DUPLICATE KEY UPDATE
-    NOMBRE = VALUES(NOMBRE),
-    DECANO_ID = VALUES(DECANO_ID);
+    nombre = VALUES(nombre),
+    decano_id = VALUES(decano_id);
 
--- Programas
-INSERT INTO PROGRAMA (ID, NOMBRE, DURACION, REGISTRO_CALIFICADO, FACULTAD_ID) VALUES
+INSERT INTO programa (id, nombre, duracion, registro_calificado, facultad_id) VALUES
 (1, 'Ingeniería de Sistemas', 10, '2023-01-15', 1),
 (2, 'Comunicación Social', 8, '2022-05-20', 2)
 ON DUPLICATE KEY UPDATE
-    NOMBRE = VALUES(NOMBRE),
-    DURACION = VALUES(DURACION),
-    REGISTRO_CALIFICADO = VALUES(REGISTRO_CALIFICADO),
-    FACULTAD_ID = VALUES(FACULTAD_ID);
+    nombre = VALUES(nombre),
+    duracion = VALUES(duracion),
+    registro_calificado = VALUES(registro_calificado),
+    facultad_id = VALUES(facultad_id);
 
--- Profesores
-INSERT INTO PROFESOR (ID, NOMBRES, APELLIDOS, EMAIL, TIPO_CONTRATO) VALUES
+INSERT INTO profesor (id, nombres, apellidos, email, tipo_contrato) VALUES
 (1, 'Carlos', 'Ramirez', 'carlos.r@university.com', 'Tiempo Completo'),
 (2, 'Marta', 'Jimenez', 'marta.j@university.com', 'Cátedra')
 ON DUPLICATE KEY UPDATE
-    NOMBRES = VALUES(NOMBRES),
-    APELLIDOS = VALUES(APELLIDOS),
-    EMAIL = VALUES(EMAIL),
-    TIPO_CONTRATO = VALUES(TIPO_CONTRATO);
+    nombres = VALUES(nombres),
+    apellidos = VALUES(apellidos),
+    email = VALUES(email),
+    tipo_contrato = VALUES(tipo_contrato);
 
--- Estudiantes
-INSERT INTO ESTUDIANTE (ID, NOMBRES, APELLIDOS, EMAIL, CODIGO) VALUES
+INSERT INTO estudiante (id, nombres, apellidos, email, codigo) VALUES
 (1, 'Juan', 'Gomez', 'juan.g@student.com', 20241001),
 (2, 'Maria', 'Rodriguez', 'maria.r@student.com', 20241002)
 ON DUPLICATE KEY UPDATE
-    NOMBRES = VALUES(NOMBRES),
-    APELLIDOS = VALUES(APELLIDOS),
-    EMAIL = VALUES(EMAIL),
-    CODIGO = VALUES(CODIGO);
+    nombres = VALUES(nombres),
+    apellidos = VALUES(apellidos),
+    email = VALUES(email),
+    codigo = VALUES(codigo);
 
--- Cursos
-INSERT INTO CURSO (ID, NOMBRE, PROGRAMA_ID, ACTIVO) VALUES
+INSERT INTO curso (id, nombre, programa_id, activo) VALUES
 (1, 'Cálculo Diferencial', 1, TRUE),
 (2, 'Programación Orientada a Objetos', 1, TRUE),
 (3, 'Teorías de la Comunicación', 2, FALSE)
 ON DUPLICATE KEY UPDATE
-    NOMBRE = VALUES(NOMBRE),
-    PROGRAMA_ID = VALUES(PROGRAMA_ID),
-    ACTIVO = VALUES(ACTIVO);
+    nombre = VALUES(nombre),
+    programa_id = VALUES(programa_id),
+    activo = VALUES(activo);
 
--- Asignaciones de Cursos a Profesores
-INSERT INTO CURSOPROFESOR (PROFESOR_ID, CURSO_ID, ANO, SEMESTRE) VALUES
+INSERT INTO cursoprofesor (profesor_id, curso_id, ano, semestre) VALUES
 (1, 1, 2025, 1),
 (2, 2, 2025, 1)
 ON DUPLICATE KEY UPDATE
-    ANO = VALUES(ANO),
-    SEMESTRE = VALUES(SEMESTRE);
+    ano = VALUES(ano),
+    semestre = VALUES(semestre);
 
--- Inscripciones de Estudiantes a Cursos
-INSERT INTO INSCRIPCION (ID, ESTUDIANTE_ID, CURSO_ID, ANO, SEMESTRE) VALUES
+INSERT INTO inscripcion (id, estudiante_id, curso_id, ano, semestre) VALUES
 (1, 1, 1, 2025, 1),
 (2, 2, 2, 2025, 1)
 ON DUPLICATE KEY UPDATE
-    ESTUDIANTE_ID = VALUES(ESTUDIANTE_ID),
-    CURSO_ID = VALUES(CURSO_ID),
-    ANO = VALUES(ANO),
-    SEMESTRE = VALUES(SEMESTRE);
+    estudiante_id = VALUES(estudiante_id),
+    curso_id = VALUES(curso_id),
+    ano = VALUES(ano),
+    semestre = VALUES(semestre);

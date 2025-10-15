@@ -1,6 +1,7 @@
 // gui/CursoLogController.java
 package gui;
 
+import javafx.application.Platform; // <-- Importar Platform
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -32,20 +33,27 @@ public class CursoLogController implements CursoObserver {
                 curso.getNombre(),
                 curso.getId()
         );
-        logEntries.add(mensaje);
-        logListView.scrollTo(logEntries.size() - 1);
+        // ✅ Ejecutar la actualización en el hilo de la UI
+        Platform.runLater(() -> {
+            logEntries.add(mensaje);
+            logListView.scrollTo(logEntries.size() - 1);
+        });
     }
 
     @Override
-    public void onCursoEliminado(Curso curso) { // <-- Nuevo método
+    public void onCursoEliminado(Curso curso) {
         String mensaje = String.format("[%s] El curso '%s' (ID: %d) ha sido eliminado.",
                 java.time.LocalDateTime.now(),
                 curso.getNombre(),
                 curso.getId()
         );
-        logEntries.add(mensaje);
-        logListView.scrollTo(logEntries.size() - 1);
+        // ✅ Ejecutar la actualización en el hilo de la UI
+        Platform.runLater(() -> {
+            logEntries.add(mensaje);
+            logListView.scrollTo(logEntries.size() - 1);
+        });
     }
+
     @Override
     public void onCursoAgregado(Curso curso) {
         String mensaje = String.format("[%s] El curso '%s' (ID: %d) ha sido agregado.",
@@ -53,9 +61,13 @@ public class CursoLogController implements CursoObserver {
                 curso.getNombre(),
                 curso.getId()
         );
-        logEntries.add(mensaje);
-        logListView.scrollTo(logEntries.size() - 1);
+        // ✅ Ejecutar la actualización en el hilo de la UI
+        Platform.runLater(() -> {
+            logEntries.add(mensaje);
+            logListView.scrollTo(logEntries.size() - 1);
+        });
     }
+
     @FXML
     private void handleCerrar() {
         stage.close();
