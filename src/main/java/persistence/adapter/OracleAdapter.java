@@ -1,0 +1,29 @@
+// src/main/java/persistence/adapter/OracleAdapter.java
+package persistence.adapter;
+
+import persistence.ConnectionFactory;
+import java.sql.Connection;
+import java.sql.SQLException;
+
+public class OracleAdapter implements DatabaseAdapter {
+    private final ConnectionFactory connectionFactory;
+
+    public OracleAdapter(ConnectionFactory connectionFactory) {
+        this.connectionFactory = connectionFactory;
+    }
+
+    @Override
+    public Connection getConnection() throws SQLException {
+        return connectionFactory.getConnection();
+    }
+
+    @Override
+    public String getInsertSyntax() {
+        return "oracle";
+    }
+
+    @Override
+    public String quote(String identifier) {
+        return "\"" + identifier.toUpperCase() + "\"";
+    }
+}
