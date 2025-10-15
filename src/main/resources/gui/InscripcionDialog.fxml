@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.GridPane?>
+<DialogPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
+    <headerText>Formulario de Inscripción a Curso</headerText>
+    <content>
+        <GridPane hgap="10" vgap="10">
+            <padding><Insets top="20" right="20" bottom="10" left="10" /></padding>
+            <Label text="Seleccionar Estudiante:" GridPane.rowIndex="0" GridPane.columnIndex="0" />
+            <ComboBox fx:id="estudianteComboBox" prefWidth="250.0" GridPane.rowIndex="0" GridPane.columnIndex="1" />
+            <Label text="Seleccionar Curso:" GridPane.rowIndex="1" GridPane.columnIndex="0" />
+            <ComboBox fx:id="cursoComboBox" prefWidth="250.0" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+            <Label text="Año:" GridPane.rowIndex="2" GridPane.columnIndex="0" />
+            <TextField fx:id="anoField" promptText="Ej: 2025" GridPane.rowIndex="2" GridPane.columnIndex="1" />
+            <Label text="Semestre:" GridPane.rowIndex="3" GridPane.columnIndex="0" />
+            <TextField fx:id="semestreField" promptText="Ej: 2" GridPane.rowIndex="3" GridPane.columnIndex="1" />
+        </GridPane>
+    </content>
+    <buttonTypes>
+        <ButtonType text="Inscribir" buttonData="OK_DONE" />
+        <ButtonType text="Cancelar" buttonData="CANCEL_CLOSE" />
+    </buttonTypes>
+</DialogPane>
