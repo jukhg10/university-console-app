@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ButtonType?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.GridPane?>
+
+<DialogPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
+    <headerText>
+        Agregar Nuevo Programa
+    </headerText>
+    <content>
+        <GridPane hgap="10" vgap="10">
+            <padding>
+                <Insets top="20" right="20" bottom="10" left="10" />
+            </padding>
+
+
+            <Label text="Nombre:" GridPane.rowIndex="0" GridPane.columnIndex="0" />
+            <TextField fx:id="nombreField" promptText="Nombre del programa" GridPane.rowIndex="0" GridPane.columnIndex="1" />
+
+            <Label text="Duración (semestres):" GridPane.rowIndex="1" GridPane.columnIndex="0" />
+            <TextField fx:id="duracionField" promptText="Ej: 8, 10" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+
+            <Label text="Fecha Registro:" GridPane.rowIndex="2" GridPane.columnIndex="0" />
+            <DatePicker fx:id="fechaPicker" GridPane.rowIndex="2" GridPane.columnIndex="1" />
+
+            <Label text="Facultad:" GridPane.rowIndex="3" GridPane.columnIndex="0" />
+            <ComboBox fx:id="facultadComboBox" prefWidth="250.0" GridPane.rowIndex="3" GridPane.columnIndex="1" />
+        </GridPane>
+    </content>
+    <buttonTypes>
+        <ButtonType fx:constant="OK" />
+        <ButtonType fx:constant="CANCEL" />
+    </buttonTypes>
+</DialogPane>

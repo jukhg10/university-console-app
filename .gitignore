@@ -1,0 +1,25 @@
+# Compiled class file
+*.class
+
+# Maven
+target/
+.mvn/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+
+# Package Files
+*.jar
+*.log
+
+# IDE
+.idea/
+*.iml
+
+# Ignorar directorios de datos de las bases de datos
+data/
+mysql-data/
+oracle-data/
